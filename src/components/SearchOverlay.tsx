@@ -17,7 +17,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
   const [searchTerm, setSearchTerm] = useState('')
   const [replaceTerm, setReplaceTerm] = useState('')
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0)
-  const [totalMatches, setTotalMatches] = useState(0)
+  const [, setTotalMatches] = useState(0)
   
   const searchInputRef = useRef<HTMLInputElement>(null)
   const replaceInputRef = useRef<HTMLInputElement>(null)

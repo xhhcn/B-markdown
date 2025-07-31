@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { EditorView, Decoration, DecorationSet } from '@codemirror/view'
-import { StateEffect, StateField, RangeSetBuilder } from '@codemirror/state'
+import { EditorView } from '@codemirror/view'
 
 interface FindReplaceDialogProps {
   isOpen: boolean
@@ -76,7 +75,7 @@ const FindReplaceDialog: React.FC<FindReplaceDialogProps> = ({
   }
   
   // 高亮匹配项
-  const highlightMatches = (matches: { from: number; to: number }[]) => {
+  const highlightMatches = (_matches: { from: number; to: number }[]) => {
     if (!editorView) return
     
     // 清除之前的高亮
