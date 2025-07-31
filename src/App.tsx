@@ -241,8 +241,8 @@ function App() {
       try {
         const result = await window.electronAPI.openFile()
         if (result) {
-          setMarkdownContent(result.content)
-          setDebouncedContent(result.content)
+          setMarkdownContent(result.content || '')
+          setDebouncedContent(result.content || '')
           setCurrentFilePath(result.filePath)
           setHasUnsavedChanges(false)
           setShowWelcome(false)
@@ -543,10 +543,12 @@ function App() {
               // 延迟隐藏进度条，让用户看到"导出完成"
               setTimeout(async () => {
                 setShowProgressDialog(false)
-                await window.electronAPI.showSuccessDialog({
-                  title: 'PDF导出成功',
-                  message: `PDF已成功导出到:\n${exportResult.filePath}`
-                })
+                if (window.electronAPI?.showSuccessDialog && exportResult.filePath) {
+                  await window.electronAPI.showSuccessDialog({
+                    title: 'PDF导出成功',
+                    message: `PDF已成功导出到:\n${exportResult.filePath}`
+                  })
+                }
               }, 1000)
             } else {
               // 如果导出失败，隐藏进度条（如果正在显示的话）
