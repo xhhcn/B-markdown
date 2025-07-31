@@ -11,6 +11,11 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: write
+  actions: read
+  checks: write
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -39,16 +44,25 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
-    - name: Clean build artifacts
+    - name: Clean build artifacts (Unix)
+      if: runner.os != 'Windows'
       run: |
         rm -rf dist dist-electron release
         find . -name "*.d.ts" -not -path "./node_modules/*" -delete || true
+        
+    - name: Clean build artifacts (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        if (Test-Path dist) { Remove-Item -Recurse -Force dist }
+        if (Test-Path dist-electron) { Remove-Item -Recurse -Force dist-electron }
+        if (Test-Path release) { Remove-Item -Recurse -Force release }
+        Get-ChildItem -Path . -Name "*.d.ts" -Recurse | Where-Object { $_ -notlike "*node_modules*" } | Remove-Item -Force
+      shell: pwsh
       
     - name: Build application
       run: npm run build:${{ matrix.platform }}
       env:
         CI: true
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
@@ -60,7 +74,7 @@ jobs:
         retention-days: 30
         
     - name: Create Release (on tag)
-      if: startsWith(github.ref, 'refs/tags/v')
+      if: startsWith(github.ref, 'refs/tags/v') && matrix.platform == 'linux'
       uses: softprops/action-gh-release@v2
       with:
         files: |
@@ -72,14 +86,15 @@ jobs:
         draft: false
         prerelease: false
         generate_release_notes: true
+        fail_on_unmatched_files: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # 额外的作业：创建 latest 构建
-  create-latest:
+  # 收集所有构建产物
+  collect-artifacts:
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: startsWith(github.ref, 'refs/tags/v')
     
     steps:
     - name: Download all artifacts
@@ -87,27 +102,25 @@ jobs:
       with:
         path: artifacts
         
-    - name: Create latest release info
+    - name: Display artifacts
       run: |
-        echo "## 🚀 Latest Build" > release-notes.md
-        echo "" >> release-notes.md
-        echo "This is an automated build from the latest main branch." >> release-notes.md
-        echo "" >> release-notes.md
-        echo "### 📦 Downloads:" >> release-notes.md
-        echo "- **macOS**: DMG files for Intel and Apple Silicon" >> release-notes.md
-        echo "- **Windows**: EXE installers and ZIP packages" >> release-notes.md
-        echo "- **Linux**: AppImage and tar.gz packages" >> release-notes.md
-        echo "" >> release-notes.md
-        echo "### ✨ Features:" >> release-notes.md
-        echo "- Real-time Markdown preview" >> release-notes.md
-        echo "- Math formula support (KaTeX)" >> release-notes.md
-        echo "- Code syntax highlighting" >> release-notes.md
-        echo "- PDF export functionality" >> release-notes.md
-        echo "- Find and replace" >> release-notes.md
-        echo "- Adjustable panel layout" >> release-notes.md
-        
-    - name: Display build summary
-      run: |
-        echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "## 📦 Build Artifacts" >> $GITHUB_STEP_SUMMARY
         echo "✅ Multi-platform build completed successfully" >> $GITHUB_STEP_SUMMARY
-        echo "📦 Artifacts ready for download" >> $GITHUB_STEP_SUMMARY
+        find artifacts -name "*.dmg" -o -name "*.zip" -o -name "*.exe" -o -name "*.AppImage" -o -name "*.tar.gz" | sort >> $GITHUB_STEP_SUMMARY
+        
+    - name: Create unified release
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          artifacts/**/*.dmg
+          artifacts/**/*.zip
+          artifacts/**/*.exe
+          artifacts/**/*.AppImage
+          artifacts/**/*.tar.gz
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+        fail_on_unmatched_files: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

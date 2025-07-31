@@ -4,8 +4,9 @@
     "noEmit": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "types": ["node"]
+    "types": ["node"],
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
-  "include": ["src/**/*", "src/types/global.d.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "dist-electron", "release", "electron"]
 }

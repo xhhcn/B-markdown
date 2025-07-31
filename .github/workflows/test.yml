@@ -28,10 +28,20 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
-    - name: Clean build artifacts
+    - name: Clean build artifacts (Unix)
+      if: runner.os != 'Windows'
       run: |
         rm -rf dist dist-electron release
         find . -name "*.d.ts" -not -path "./node_modules/*" -delete || true
+        
+    - name: Clean build artifacts (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        if (Test-Path dist) { Remove-Item -Recurse -Force dist }
+        if (Test-Path dist-electron) { Remove-Item -Recurse -Force dist-electron }
+        if (Test-Path release) { Remove-Item -Recurse -Force release }
+        Get-ChildItem -Path . -Name "*.d.ts" -Recurse | Where-Object { $_ -notlike "*node_modules*" } | Remove-Item -Force
+      shell: pwsh
       
     - name: Run type check
       run: npx tsc --project tsconfig.test.json

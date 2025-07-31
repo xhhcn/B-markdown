@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
+import './types/global'
 import CodeMirror from '@uiw/react-codemirror'
 import { markdown as markdownLang } from '@codemirror/lang-markdown'
 import { oneDark } from '@codemirror/theme-one-dark'

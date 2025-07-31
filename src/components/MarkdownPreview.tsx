@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useEffect, useCallback } from 'react'
+import '../types/global'
 import { unified } from 'unified'
 import remarkParse from 'remark-parse'
 import remarkGfm from 'remark-gfm'
