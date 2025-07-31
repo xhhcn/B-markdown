@@ -28,26 +28,16 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
-    - name: Run type check
+    - name: Run type check (Frontend)
       run: npx tsc --noEmit
       
-    - name: Build frontend
-      run: npm run dev -- --mode=production &
-      env:
-        CI: true
-        
-    - name: Wait for build
-      run: sleep 10
+    - name: Run type check (Electron)
+      run: npx tsc --project tsconfig.electron.json --noEmit
       
-    - name: Stop dev server
-      run: pkill -f "vite" || true
-      if: runner.os != 'Windows'
-        
-    - name: Stop dev server (Windows)
-      run: taskkill /F /IM node.exe /T || echo "No Node processes to kill"
-      if: runner.os == 'Windows'
-      
-    - name: Build production
+    - name: Build application (production test)
       run: npx vite build
       env:
         CI: true
+        
+    - name: Build Electron (production test)  
+      run: npx tsc --project tsconfig.electron.json
