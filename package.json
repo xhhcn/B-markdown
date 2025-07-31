@@ -93,6 +93,7 @@
     },
     "linux": {
       "icon": "build/icon.icns",
+      "category": "Office",
       "target": [
         {
           "target": "AppImage",

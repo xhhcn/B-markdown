@@ -410,7 +410,6 @@ function createMenu() {
 }
 
 // 打开文件
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function openFile() {
   console.log('Menu Open File clicked')
   if (!mainWindow) {

@@ -9,6 +9,8 @@ dist/
 dist-electron/
 release/
 *.tsbuildinfo
+*.d.ts
+!*.d.ts.example
 
 # Environment files
 .env
