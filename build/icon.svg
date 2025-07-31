@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 深灰色毛玻璃渐变背景 -->
+    <linearGradient id="glassGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3A3A3C;stop-opacity:0.95" />
+      <stop offset="50%" style="stop-color:#2C2C2E;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#1C1C1E;stop-opacity:0.95" />
+    </linearGradient>
+    <!-- 文档渐变 -->
+    <linearGradient id="docGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.95" />
+      <stop offset="100%" style="stop-color:#F2F2F7;stop-opacity:0.9" />
+    </linearGradient>
+    <!-- 高光效果 -->
+    <linearGradient id="highlight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#FFFFFF;stop-opacity:0.05" />
+    </linearGradient>
+    <!-- 阴影滤镜 -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="2" dy="4" stdDeviation="8" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- 主背景 - 深灰色毛玻璃效果 -->
+  <rect x="64" y="64" width="384" height="384" rx="84" ry="84" fill="url(#glassGradient)" filter="url(#shadow)"/>
+  
+  <!-- 高光层 -->
+  <rect x="64" y="64" width="384" height="192" rx="84" ry="84" fill="url(#highlight)" opacity="0.6"/>
+  
+  <!-- 文档主体 - 简约设计 -->
+  <rect x="160" y="140" width="192" height="240" rx="12" ry="12" fill="url(#docGradient)" filter="url(#shadow)"/>
+  
+  <!-- 文档折角 - 简洁设计 -->
+  <path d="M 312 140 L 336 140 Q 352 140 352 156 L 352 164 Q 352 180 336 180 L 328 180 Q 312 180 312 164 Z" fill="#E5E5EA" opacity="0.7"/>
+  
+  <!-- 文本线条 - 代表markdown内容 -->
+  <rect x="180" y="200" width="120" height="3" rx="1.5" fill="#8E8E93" opacity="0.7"/>
+  <rect x="180" y="220" width="152" height="3" rx="1.5" fill="#8E8E93" opacity="0.6"/>
+  <rect x="180" y="240" width="100" height="3" rx="1.5" fill="#8E8E93" opacity="0.5"/>
+  <rect x="180" y="260" width="140" height="3" rx="1.5" fill="#8E8E93" opacity="0.6"/>
+  <rect x="180" y="280" width="80" height="3" rx="1.5" fill="#8E8E93" opacity="0.4"/>
+  <rect x="180" y="300" width="110" height="3" rx="1.5" fill="#8E8E93" opacity="0.5"/>
+  
+  <!-- 编辑指示器 - 简单的光标线 -->
+  <rect x="300" y="240" width="2" height="16" fill="#007AFF" opacity="0.8"/>
+</svg>

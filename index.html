@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Markdown Editor</title>
+    <!-- KaTeX CSS for math rendering - preload for faster loading -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" as="style" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous" media="print" onload="this.media='all'">
+    <!-- Highlight.js CSS for syntax highlighting - preload for faster loading -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css" as="style">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css" media="print" onload="this.media='all'">
+    <!-- 自定义语法高亮样式 -->
+    <style>
+      /* 学术风格的语法高亮配色 - 质朴而专业 */
+      .hljs {
+        background: rgba(0, 0, 0, 0.03) !important; /* 极轻微的背景色 */
+        border-radius: 4px !important;
+        font-family: "Courier New", Courier, "Liberation Mono", Monaco, Menlo, monospace !important;
+        color: #D4D4D4 !important; /* 默认文本颜色 */
+        /* 隐藏滚动条 */
+        -ms-overflow-style: none !important; /* Internet Explorer 10+ */
+        scrollbar-width: none !important; /* Firefox */
+      }
+      
+      /* 隐藏语法高亮代码块的Webkit滚动条 */
+      .hljs::-webkit-scrollbar {
+        display: none;
+      }
+      
+      .hljs-keyword,
+      .hljs-selector-tag,
+      .hljs-subst {
+        color: #8FA1B3 !important; /* 深蓝灰色，关键字 */
+      }
+      
+      .hljs-string,
+      .hljs-doctag {
+        color: #7A8471 !important; /* 深橄榄绿，字符串 */
+      }
+      
+      .hljs-comment,
+      .hljs-quote {
+        color: #6B7280 !important; /* 中性灰色，注释 */
+        font-style: italic;
+      }
+      
+      .hljs-number,
+      .hljs-literal {
+        color: #A0845C !important; /* 深金色，数字 */
+      }
+      
+      .hljs-function,
+      .hljs-title {
+        color: #7C94B6 !important; /* 深蓝色，函数名 */
+      }
+      
+      .hljs-variable,
+      .hljs-attr {
+        color: #A18B62 !important; /* 深黄褐色，变量 */
+      }
+      
+      /* 确保内联代码也有合适的样式 */
+      .preview-content code:not(.hljs) {
+        background: rgba(255, 255, 255, 0.06) !important;
+        color: #8FA1B3 !important;
+        padding: 2px 4px !important;
+        border-radius: 3px !important;
+        font-family: "Courier New", Courier, "Liberation Mono", Monaco, Menlo, monospace !important;
+      }
+      
+      /* 强制隐藏所有可能的代码滚动条 */
+      .preview-content pre,
+      .preview-content .hljs,
+      .preview-content pre .hljs,
+      .preview-content code .hljs {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+      }
+      
+      .preview-content pre::-webkit-scrollbar,
+      .preview-content .hljs::-webkit-scrollbar,
+      .preview-content pre .hljs::-webkit-scrollbar,
+      .preview-content code .hljs::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html> 

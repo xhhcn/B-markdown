@@ -1,0 +1,1071 @@
+/* Welcome Screen Styles */
+.welcome-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.welcome-content {
+  text-align: center;
+  max-width: 400px;
+  padding: 40px;
+}
+
+.welcome-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.6));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.welcome-subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 40px;
+  font-weight: 400;
+}
+
+.welcome-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+  justify-content: center;
+  align-items: center;
+}
+
+.welcome-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 20px 32px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+  max-width: 280px;
+  min-height: 60px;
+  justify-content: center;
+  gap: 12px;
+}
+
+.welcome-button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.welcome-icon {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.8);
+  flex-shrink: 0;
+}
+
+.welcome-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+}
+
+
+
+.welcome-footer {
+  margin-top: 32px;
+}
+
+.welcome-footer p {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+}
+
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: transparent;
+  color: #ffffff;
+  height: 100vh;
+  overflow: hidden;
+  margin: 0;
+  font-synthesis: none;
+  padding: 0;
+}
+
+#root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 
+              0 16px 64px rgba(0, 0, 0, 0.25),
+              0 24px 96px rgba(0, 0, 0, 0.15),
+              0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.header {
+  background: #2d2d2d;
+  border-bottom: 1px solid #3d3d3d;
+  font-size: 13px;
+  font-weight: 500;
+  color: #ffffff;
+  -webkit-app-region: drag;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0;
+}
+
+.header-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  pointer-events: none; /* 确保不阻挡拖拽 */
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 500;
+  user-select: none;
+  letter-spacing: 0.3px;
+}
+
+.markdown-icon {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.unsaved-dot {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 18px;
+  font-weight: bold;
+  margin-left: 4px;
+}
+
+.editor-container {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.editor-panel {
+  flex: none; /* 不使用flex自动分配 */
+  min-width: 200px; /* 最小宽度限制 */
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden; /* 防止内容溢出 */
+  max-height: 100%;
+}
+
+.resize-handle {
+  width: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  cursor: col-resize;
+  transition: background-color 0.2s, width 0.2s;
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0; /* 防止被压缩 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resize-handle::before {
+  content: '';
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 0.5px;
+  transition: opacity 0.2s, height 0.2s;
+}
+
+.resize-handle:hover {
+  background: rgba(255, 255, 255, 0.12);
+  width: 4px;
+}
+
+.resize-handle:hover::before {
+  opacity: 0.8;
+  height: 20px;
+}
+
+.resize-handle:active {
+  background: rgba(255, 255, 255, 0.15);
+  width: 4px;
+}
+
+/* 拖拽时禁用文本选择 */
+body.resizing {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.preview-panel {
+  flex: none; /* 不使用flex自动分配 */
+  min-width: 200px; /* 最小宽度限制 */
+  background: rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  overflow-y: overlay;
+  overflow-x: hidden; /* 禁用横向滚动，恢复换行 */
+  padding: 28px 20px 8px 20px; /* 上下8px留空 + 20px内容边距 */
+  min-height: 0;
+}
+
+.cm-editor {
+  height: 100% !important;
+  font-size: 14px;
+  background: transparent !important;
+}
+
+.cm-focused {
+  outline: none !important;
+}
+
+/* 移除编号列背景 - 保持一致 */
+.editor-panel::before {
+  display: none;
+}
+
+/* CodeMirror毛玻璃效果 - 强制滚动 */
+.cm-editor {
+  background: transparent !important;
+  height: 100% !important;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  min-height: 0;
+  overflow: visible !important;
+}
+
+.cm-editor .cm-scroller {
+  background: transparent !important;
+  height: 100% !important;
+  overflow-y: overlay !important;
+  overflow-x: auto !important; /* 只在内容真正超出时显示横向滚动 */
+  scroll-behavior: smooth !important;
+  max-height: 100% !important;
+}
+
+.cm-editor .cm-content {
+  background: transparent !important;
+  padding-left: 0 !important;
+  min-height: auto !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+.cm-editor .cm-line {
+  background: transparent !important;
+}
+
+.cm-editor .cm-focused {
+  background: transparent !important;
+}
+
+.cm-editor .cm-gutters {
+  background: transparent !important;
+  border-right: none !important;
+  width: auto !important;
+  min-width: unset !important; /* 移除固定最小宽度 */
+  position: static !important; /* 确保不是固定定位 */
+  z-index: 1; /* 降低z-index，让其跟随内容滚动 */
+  padding: 0 !important; /* 移除内边距 */
+}
+
+.cm-editor .cm-gutter {
+  background: transparent !important;
+}
+
+.cm-editor .cm-lineNumbers {
+  background: transparent !important;
+}
+
+.cm-editor .cm-lineNumbers .cm-gutterElement {
+  color: rgba(255, 255, 255, 0.65) !important;
+  padding: 0 8px 0 4px !important; /* 左边4px，右边8px，确保与内容对齐 */
+  text-align: right !important; /* 右对齐 */
+  min-width: unset !important; /* 移除固定最小宽度 */
+  display: block !important; /* 改为block以确保完整宽度 */
+  width: 100% !important; /* 占满容器宽度 */
+}
+
+/* 当前行高亮 - 确保背景连贯 */
+.cm-editor .cm-activeLine {
+  background: rgba(255, 255, 255, 0.025) !important;
+}
+
+.cm-editor .cm-activeLineGutter {
+  background: rgba(255, 255, 255, 0.035) !important;
+  width: 100% !important; /* 确保背景覆盖整个行号列宽度 */
+}
+
+/* 确保行号列背景连贯 */
+.cm-editor .cm-lineNumbers {
+  background: transparent !important;
+  width: 100% !important;
+}
+
+/* 完全隐藏滚动条但保持滚动功能 */
+.cm-editor .cm-scroller,
+.preview-panel {
+  scrollbar-width: none; /* Firefox: 隐藏滚动条 */
+  -ms-overflow-style: none; /* IE: 隐藏滚动条 */
+}
+
+.cm-editor .cm-scroller::-webkit-scrollbar,
+.preview-panel::-webkit-scrollbar {
+  display: none; /* Webkit: 完全隐藏滚动条 */
+}
+
+
+
+/* 覆盖CodeMirror默认主题 */
+.cm-theme-dark {
+  background: transparent !important;
+}
+
+.cm-editor.cm-focused .cm-scroller {
+  background: transparent !important;
+}
+
+/* Preview styles for glass effect */
+.preview-content {
+  padding-bottom: 0; /* 不需要额外底部间距，容器已处理 */
+  word-wrap: break-word; /* 允许长单词换行 */
+  overflow-wrap: break-word; /* 确保超长内容可以换行 */
+  line-height: 1.6; /* 标准行距，与PDF导出一致 */
+  font-size: 14px; /* 基础字体大小 */
+}
+
+/* 确保预览内容第一个元素与编辑器对齐 */
+.preview-content > *:first-child {
+  margin-top: 0 !important; /* 移除第一个元素的上边距 */
+}
+
+/* 段落和基本文本样式 */
+.preview-content p {
+  margin: 15px 0; /* 标准段落间距 */
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* 图片自适应宽度 */
+.preview-content img {
+  max-width: 100%; /* 不超出容器宽度 */
+  height: auto; /* 保持宽高比 */
+  display: block; /* 块级显示 */
+  margin: 15px auto; /* 标准间距，居中显示 */
+  border-radius: 4px; /* 圆角效果 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+}
+
+/* 表格样式 - 响应式处理 */
+/* 表格容器 - 支持横向滚动 */
+.preview-content table {
+  border-collapse: collapse;
+  margin: 15px 0; /* 标准间距，与其他元素一致 */
+  font-size: 0.9em; /* 稍小的字体以适应更多内容 */
+  line-height: 1.6; /* 标准行距 */
+  width: 100%;
+  display: block;
+  overflow-x: auto; /* 表格横向滚动 */
+  white-space: nowrap; /* 防止表格内容换行 */
+  /* 隐藏滚动条 */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* 隐藏表格的Webkit滚动条 */
+.preview-content table::-webkit-scrollbar {
+  display: none;
+}
+
+/* 恢复表格内部结构 */
+.preview-content table thead,
+.preview-content table tbody,
+.preview-content table tfoot {
+  display: table-header-group;
+}
+
+.preview-content table tbody {
+  display: table-row-group;
+}
+
+.preview-content table tfoot {
+  display: table-footer-group;
+}
+
+.preview-content table tr {
+  display: table-row;
+}
+
+.preview-content table th,
+.preview-content table td {
+  display: table-cell;
+  white-space: normal; /* 单元格内允许正常换行 */
+}
+
+.preview-content th,
+.preview-content td {
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  text-align: left;
+  word-wrap: break-word; /* 允许单元格内容换行 */
+}
+
+.preview-content th {
+  background: rgba(255, 255, 255, 0.1);
+  font-weight: bold;
+}
+
+.preview-content h1 {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 2em; /* 28px */
+  margin: 20px 0 10px; /* 标准标题间距，与PDF一致 */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 0.3em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+}
+
+.preview-content h2 {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.5em; /* 24px */
+  margin: 20px 0 10px; /* 标准标题间距，与PDF一致 */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 0.3em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+}
+
+.preview-content h3 {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.25em; /* 18px */
+  margin: 20px 0 10px; /* 标准标题间距，与PDF一致 */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+}
+
+/* h4, h5, h6 标题样式 */
+.preview-content h4 {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.15em; /* 16px */
+  margin: 20px 0 10px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+}
+
+.preview-content h5 {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95em; /* 13px */
+  margin: 20px 0 10px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+}
+
+.preview-content h6 {
+  color: rgba(255, 255, 255, 0.7); /* 稍暗的颜色 */
+  font-size: 0.85em; /* 12px */
+  margin: 20px 0 10px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+}
+
+/* 第一个标题的顶部间距调整 */
+.preview-content h1:first-child,
+.preview-content h2:first-child,
+.preview-content h3:first-child,
+.preview-content h4:first-child,
+.preview-content h5:first-child,
+.preview-content h6:first-child {
+  margin-top: 0;
+}
+
+.preview-content ul, .preview-content ol {
+  margin: 15px 0; /* 与段落间距一致，标准间距 */
+  padding-left: 2em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.preview-content li {
+  margin: 4px 0; /* 列表项之间的小间距 */
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  line-height: 1.6; /* 继承标准行距 */
+}
+
+.preview-content ul li {
+  list-style-type: disc;
+}
+
+.preview-content ol li {
+  list-style-type: decimal;
+}
+
+.preview-content pre {
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: none;
+  border-radius: 4px;
+  padding: 16px; /* 标准内边距 */
+  margin: 15px 0; /* 与其他元素间距一致 */
+  overflow-x: auto; /* 代码块横向滚动 */
+  white-space: pre; /* 保持代码格式，不自动换行 */
+  word-wrap: normal; /* 不强制换行 */
+  line-height: 1.45; /* 代码块专用行距，稍紧凑 */
+  font-size: 13px; /* 代码字体稍小 */
+  /* 隐藏滚动条 */
+  -ms-overflow-style: none !important; /* Internet Explorer 10+ */
+  scrollbar-width: none !important; /* Firefox */
+}
+
+/* 隐藏所有代码块的Webkit滚动条 */
+.preview-content pre::-webkit-scrollbar,
+.preview-content pre .hljs::-webkit-scrollbar {
+  display: none !important;
+}
+
+.preview-content code {
+  background: rgba(0, 0, 0, 0.1);
+  color: #ce9178;
+  padding: 0.2em 0.4em;
+  border-radius: 2px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.9em;
+  border: none;
+  word-wrap: break-word; /* 内联代码可以换行 */
+}
+
+.preview-content pre code {
+  background: none;
+  padding: 0;
+  color: #d4d4d4;
+  border: none;
+  white-space: pre; /* 保持代码块格式，不换行 */
+}
+
+.preview-content blockquote {
+  border-left: 4px solid rgba(255, 255, 255, 0.4);
+  margin: 15px 0; /* 标准间距，与其他元素一致 */
+  padding: 8px 0 8px 16px; /* 标准内边距 */
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  line-height: 1.6; /* 继承标准行距 */
+}
+
+.preview-content input[type="checkbox"] {
+  margin-right: 0.5em;
+}
+
+.preview-content input[type="checkbox"]:checked + * {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* 预览内容中的链接样式 */
+.preview-content a {
+  color: rgba(255, 255, 255, 0.6) !important; /* 深灰色 */
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.preview-content a:hover {
+  color: rgba(255, 255, 255, 0.8) !important; /* 悬停时稍亮 */
+  text-decoration: underline;
+}
+
+/* KaTeX数学公式样式 */
+.preview-content .katex {
+  color: rgba(255, 255, 255, 0.9) !important;
+  overflow-x: auto; /* 内联数学公式也支持横向滚动 */
+  max-width: 100%; /* 限制最大宽度 */
+  /* 修复行内公式高度问题 - 使用inline而不是inline-block */
+  display: inline; /* 保持行内显示，不影响行高 */
+  vertical-align: baseline; /* 确保与文本基线对齐 */
+  /* 隐藏滚动条 */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* 隐藏内联数学公式的Webkit滚动条 */
+.preview-content .katex::-webkit-scrollbar {
+  display: none;
+}
+
+.preview-content .katex-display {
+  margin: 1em 0 !important;
+  text-align: center;
+  overflow-x: auto; /* 数学公式横向滚动 */
+  white-space: nowrap; /* 防止公式换行 */
+  padding: 5px 0; /* 给滚动条留点空间 */
+  /* 隐藏滚动条 */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* 隐藏数学公式块的Webkit滚动条 */
+.preview-content .katex-display::-webkit-scrollbar {
+  display: none;
+}
+
+.preview-content .katex .base {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* 确保数学公式文字颜色与主题一致 */
+.preview-content .katex .mord {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.preview-content .katex .mop {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.preview-content .katex .mbin {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.preview-content .katex .mrel {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.preview-content .katex .mopen,
+.preview-content .katex .mclose {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.preview-content .katex .mpunct {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* 查找/替换对话框样式 */
+.find-replace-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.find-replace-dialog {
+  background: rgba(40, 44, 52, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  padding: 0;
+  min-width: 400px;
+  max-width: 500px;
+  color: #abb2bf;
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-synthesis: none;
+  overflow: hidden;
+  animation: slideIn 0.2s ease-out;
+}
+
+.find-replace-header {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.find-replace-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e06c75;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: #abb2bf;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e06c75;
+}
+
+.find-replace-content {
+  padding: 16px;
+}
+
+.input-group {
+  margin-bottom: 12px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #c678dd;
+}
+
+.input-with-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-input,
+.replace-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #abb2bf;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus,
+.replace-input:focus {
+  outline: none;
+  border-color: #61afef;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 2px rgba(97, 175, 239, 0.2);
+}
+
+.search-input::placeholder,
+.replace-input::placeholder {
+  color: #5c6370;
+}
+
+.search-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.control-button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  padding: 6px 8px;
+  color: #abb2bf;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 28px;
+}
+
+.control-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.control-button.active {
+  background: rgba(97, 175, 239, 0.2);
+  border-color: #61afef;
+  color: #61afef;
+}
+
+.search-info {
+  margin: 12px 0;
+  font-size: 12px;
+  color: #98c379;
+  text-align: center;
+  padding: 6px;
+  background: rgba(152, 195, 121, 0.1);
+  border-radius: 4px;
+  border: 1px solid rgba(152, 195, 121, 0.2);
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.navigation-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.nav-button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  padding: 6px 10px;
+  color: #abb2bf;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 32px;
+}
+
+.nav-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.replace-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.replace-button,
+.replace-all-button {
+  background: rgba(224, 108, 117, 0.2);
+  border: 1px solid rgba(224, 108, 117, 0.4);
+  border-radius: 6px;
+  padding: 6px 12px;
+  color: #e06c75;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.replace-button:hover:not(:disabled),
+.replace-all-button:hover:not(:disabled) {
+  background: rgba(224, 108, 117, 0.3);
+  border-color: #e06c75;
+}
+
+.replace-button:disabled,
+.replace-all-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.find-replace-footer {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 8px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+}
+
+.find-replace-footer small {
+  color: #5c6370;
+  font-size: 11px;
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 搜索覆盖层样式 */
+.search-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.search-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.search-input {
+  width: 320px;
+  background: #2a2a2a;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 400;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.search-input:focus {
+  background: #323232;
+  color: rgba(255, 255, 255, 1);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+  transform: translateY(-1px);
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* 进度条对话框样式 - 匹配深灰色毛玻璃主题 */
+.progress-overlay {
+  position: fixed;
+  top: 28px; /* 避免覆盖头部区域 */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(20px) saturate(150%) brightness(0.7);
+  -webkit-backdrop-filter: blur(20px) saturate(150%) brightness(0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.progress-dialog {
+  background: rgba(30, 30, 30, 0.98);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border-radius: 18px;
+  padding: 32px;
+  min-width: 340px;
+  text-align: center;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35),
+              0 12px 30px rgba(0, 0, 0, 0.25),
+              0 4px 12px rgba(0, 0, 0, 0.15),
+              inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.progress-dialog h3 {
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0 0 24px 0;
+  font-size: 19px;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.progress-bar-container {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  height: 12px;
+  overflow: hidden;
+  margin: 22px 0;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.25),
+              inset 0 1px 0 rgba(0, 0, 0, 0.1),
+              0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, #007aff 0%, #5ac8fa 50%, #34c759 100%);
+  height: 100%;
+  border-radius: 12px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 16px rgba(0, 122, 255, 0.5),
+              0 2px 6px rgba(0, 122, 255, 0.3),
+              0 0 0 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.progress-message {
+  color: rgba(255, 255, 255, 0.75);
+  margin: 16px 0 8px 0;
+  font-size: 15px;
+  font-weight: 400;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.progress-percentage {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 17px;
+  font-weight: 600;
+  margin-top: 12px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+} 

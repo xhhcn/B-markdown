@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Markdown Editor Icon Generator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .canvas-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        canvas {
+            border: 1px solid #ddd;
+            background: white;
+        }
+        .size-label {
+            text-align: center;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #0056CC;
+        }
+        .preview {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Markdown Editor Icon Generator</h1>
+    
+    <div class="controls">
+        <button onclick="generateIcons()">生成图标</button>
+        <button onclick="downloadAll()">下载所有尺寸</button>
+    </div>
+    
+    <div class="canvas-container" id="canvasContainer"></div>
+    
+    <div class="preview">
+        <h3>图标预览 (将在macOS Dock中显示)</h3>
+        <div id="previewContainer"></div>
+    </div>
+
+    <script>
+        const sizes = [16, 32, 64, 128, 256, 512, 1024];
+        const canvases = {};
+
+        function createCanvas(size) {
+            const container = document.createElement('div');
+            const canvas = document.createElement('canvas');
+            const label = document.createElement('div');
+            
+            canvas.width = size;
+            canvas.height = size;
+            canvas.style.width = Math.min(size, 128) + 'px';
+            canvas.style.height = Math.min(size, 128) + 'px';
+            
+            label.className = 'size-label';
+            label.textContent = `${size}x${size}`;
+            
+            container.appendChild(canvas);
+            container.appendChild(label);
+            
+            return { container, canvas };
+        }
+
+        function drawIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            const scale = size / 512; // 基于512px设计
+            
+            // 清除画布
+            ctx.clearRect(0, 0, size, size);
+            
+            // 背景渐变
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#4A90E2');
+            gradient.addColorStop(1, '#2C5DD9');
+            
+            // 绘制圆角矩形背景
+            const cornerRadius = size * 0.15;
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.roundRect(size * 0.05, size * 0.05, size * 0.9, size * 0.9, cornerRadius);
+            ctx.fill();
+            
+            // 绘制文档图标
+            ctx.fillStyle = 'white';
+            
+            // 文档主体
+            const docWidth = size * 0.45;
+            const docHeight = size * 0.6;
+            const docX = size * 0.275;
+            const docY = size * 0.2;
+            
+            ctx.fillRect(docX, docY, docWidth, docHeight);
+            
+            // 文档折角
+            const foldSize = size * 0.08;
+            ctx.fillStyle = '#E0E0E0';
+            ctx.beginPath();
+            ctx.moveTo(docX + docWidth - foldSize, docY);
+            ctx.lineTo(docX + docWidth, docY + foldSize);
+            ctx.lineTo(docX + docWidth - foldSize, docY + foldSize);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Markdown符号 "M↓"
+            ctx.fillStyle = '#4A90E2';
+            ctx.font = `bold ${size * 0.12}px -apple-system, BlinkMacSystemFont, 'SF Pro Display'`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // M字母
+            const textY = docY + docHeight * 0.35;
+            ctx.fillText('M', size * 0.5, textY);
+            
+            // 下箭头符号
+            const arrowSize = size * 0.06;
+            const arrowY = textY + size * 0.08;
+            ctx.beginPath();
+            ctx.moveTo(size * 0.5 - arrowSize/2, arrowY);
+            ctx.lineTo(size * 0.5 + arrowSize/2, arrowY);
+            ctx.lineTo(size * 0.5, arrowY + arrowSize);
+            ctx.closePath();
+            ctx.fill();
+            
+            // 添加一些装饰线条表示文本
+            ctx.fillStyle = '#C0C0C0';
+            const lineHeight = size * 0.015;
+            const lineSpacing = size * 0.035;
+            const lineStartX = docX + size * 0.05;
+            const lineWidth1 = docWidth * 0.7;
+            const lineWidth2 = docWidth * 0.5;
+            const linesStartY = docY + docHeight * 0.6;
+            
+            // 绘制几条文本线
+            for (let i = 0; i < 3; i++) {
+                const y = linesStartY + i * lineSpacing;
+                const width = i === 2 ? lineWidth2 : lineWidth1;
+                ctx.fillRect(lineStartX, y, width, lineHeight);
+            }
+        }
+
+        function generateIcons() {
+            const container = document.getElementById('canvasContainer');
+            container.innerHTML = '';
+            
+            sizes.forEach(size => {
+                const { container: canvasContainer, canvas } = createCanvas(size);
+                canvases[size] = canvas;
+                container.appendChild(canvasContainer);
+                drawIcon(canvas, size);
+            });
+            
+            // 创建预览
+            createPreview();
+        }
+
+        function createPreview() {
+            const preview = document.getElementById('previewContainer');
+            preview.innerHTML = '';
+            
+            // 显示不同尺寸的预览
+            [16, 32, 64, 128].forEach(size => {
+                if (canvases[size]) {
+                    const img = new Image();
+                    img.src = canvases[size].toDataURL();
+                    img.style.width = size + 'px';
+                    img.style.height = size + 'px';
+                    img.style.marginRight = '10px';
+                    img.style.border = '1px solid #ddd';
+                    preview.appendChild(img);
+                }
+            });
+        }
+
+        function downloadCanvas(canvas, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function downloadAll() {
+            sizes.forEach(size => {
+                if (canvases[size]) {
+                    setTimeout(() => {
+                        downloadCanvas(canvases[size], `icon_${size}x${size}.png`);
+                    }, size); // 延迟避免同时下载
+                }
+            });
+        }
+
+        // 页面加载时自动生成图标
+        window.onload = generateIcons;
+    </script>
+</body>
+</html>
