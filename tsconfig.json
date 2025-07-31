@@ -17,7 +17,7 @@
     "noFallthroughCasesInSwitch": true,
     "types": ["node"]
   },
-  "include": ["src", "electron"],
-  "exclude": ["node_modules", "dist", "dist-electron", "release", "**/*.d.ts"],
+  "include": ["src/**/*", "electron/**/*.ts"],
+  "exclude": ["node_modules", "dist", "dist-electron", "release", "**/*.d.ts", "electron/**/*.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 } 

@@ -34,7 +34,7 @@ jobs:
         find . -name "*.d.ts" -not -path "./node_modules/*" -delete || true
       
     - name: Run type check
-      run: npx tsc --noEmit --skipLibCheck
+      run: npx tsc --project tsconfig.test.json
       
     - name: Build production
       run: npx vite build
