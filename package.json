@@ -69,12 +69,7 @@
       "dist-electron/**/*",
       "public/**/*"
     ],
-    "extraResources": [
-      {
-        "from": "build/icon.icns",
-        "to": "icon.icns"
-      }
-    ],
+
     "mac": {
       "target": [
         {

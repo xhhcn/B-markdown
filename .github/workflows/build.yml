@@ -115,6 +115,9 @@ jobs:
             echo "Building for Intel (x64)"
           fi
           
+          # Clean release directory before build to avoid conflicts
+          rm -rf release/
+          
           # Build for specific architecture
           if [ "${{ matrix.arch }}" = "arm64" ]; then
             npm run build:mac:dir:arm64
