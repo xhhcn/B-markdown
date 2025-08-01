@@ -123,31 +123,25 @@ jobs:
           export ELECTRON_ENABLE_STACK_DUMPING=false
           export ELECTRON_ENABLE_LOGGING=false
           
-          # Build for specific architecture with explicit parameters
+          # Build DMG for specific architecture 
           if [ "${{ matrix.arch }}" = "arm64" ]; then
-            npm run build:mac:dir:arm64 -- --config.compression=maximum --config.nsis.oneClick=false
+            npm run build:mac:arm64
           else
-            npm run build:mac:dir:x64 -- --config.compression=maximum --config.nsis.oneClick=false
+            npm run build:mac:x64
           fi
           
-          # Fix permissions and apply ad-hoc signing for macOS app
-          if [ "${{ matrix.arch }}" = "arm64" ]; then
-            APP_PATH="release/mac-arm64/B-Markdown.app"
-            chmod +x "$APP_PATH/Contents/MacOS/B-Markdown"
-            echo "Fixed permissions for ARM64 build"
-          else
-            APP_PATH="release/mac/B-Markdown.app"
-            chmod +x "$APP_PATH/Contents/MacOS/B-Markdown"
-            echo "Fixed permissions for Intel build"
+          # Check DMG files instead of app
+          echo "🔍 Looking for DMG files..."
+          ls -la release/
+          
+          # Find the DMG file
+          DMG_FILE=$(find release/ -name "*.dmg" | head -1)
+          if [ -z "$DMG_FILE" ]; then
+            echo "❌ ERROR: No DMG file found!"
+            exit 1
           fi
           
-          # Apply ad-hoc code signing to make the app trusted
-          echo "Applying ad-hoc code signing..."
-          codesign --force --deep --sign - "$APP_PATH"
-          echo "Code signing completed"
-          
-          # Verify the signing
-          codesign --verify --verbose "$APP_PATH" || echo "Code signing verification completed"
+          echo "✅ Found DMG: $DMG_FILE"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -177,97 +171,53 @@ jobs:
       #       release/*.blockmap
       #     if-no-files-found: error
 
-      - name: Check app size and enforce limits
+      - name: Check DMG size and enforce limits
         if: matrix.platform == 'darwin'
         shell: bash
         run: |
-          if [ "${{ matrix.arch }}" = "arm64" ]; then
-            APP_PATH="release/mac-arm64/B-Markdown.app"
-          else
-            APP_PATH="release/mac/B-Markdown.app"
+          # Find the DMG file
+          DMG_FILE=$(find release/ -name "*.dmg" | head -1)
+          if [ -z "$DMG_FILE" ]; then
+            echo "❌ ERROR: No DMG file found!"
+            exit 1
           fi
           
-          echo "=== 📊 APP SIZE CHECK START ==="
+          echo "=== 📊 DMG SIZE CHECK START ==="
+          echo "🔍 Checking DMG file: $DMG_FILE"
           
-          # Check initial size using multiple methods
-          INITIAL_SIZE_DU=$(du -s "$APP_PATH" | cut -f1)
-          INITIAL_SIZE_MB_DU=$((INITIAL_SIZE_DU / 1024))
-          INITIAL_SIZE_MB_REAL=$(du -sm "$APP_PATH" | cut -f1)
-          echo "📏 Initial app size (du -s method): ${INITIAL_SIZE_MB_DU}MB"
-          echo "📏 Initial app size (du -sm method): ${INITIAL_SIZE_MB_REAL}MB"
-          echo "📏 Initial app size: ${INITIAL_SIZE_MB}MB"
+          # Check DMG size using multiple methods
+          DMG_SIZE_MB=$(du -sm "$DMG_FILE" | cut -f1)
+          DMG_SIZE_BYTES=$(ls -l "$DMG_FILE" | awk '{print $5}')
+          DMG_SIZE_BYTES_MB=$((DMG_SIZE_BYTES / 1024 / 1024))
           
-          # Debug: Check what's causing the size difference
-          echo "🔍 Analyzing app contents..."
-          echo "=== COMPLETE DIRECTORY ANALYSIS ==="
-          echo "All Contents subdirectories:"
-          du -sh "$APP_PATH/Contents/"* 2>/dev/null || echo "Could not analyze all directories"
-          echo "=== FRAMEWORKS ANALYSIS ==="
-          echo "Frameworks directory size:"
-          du -sh "$APP_PATH/Contents/Frameworks/"
-          echo "Helper apps count:"
-          ls -la "$APP_PATH/Contents/Frameworks/" | grep Helper | wc -l
-          echo "Electron Framework size:"
-          ls -lh "$APP_PATH/Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework" || echo "Not found"
-          echo "=== RESOURCES ANALYSIS ==="
-          echo "Resources directory size:"
-          du -sh "$APP_PATH/Contents/Resources/" 2>/dev/null || echo "No Resources directory"
-          echo "=== HIDDEN FILES CHECK ==="
-          echo "Looking for hidden or unusual files:"
-          find "$APP_PATH" -name ".*" -type f -exec ls -lh {} \; 2>/dev/null | head -5 || echo "No hidden files found"
-          echo "=== ASAR FILE CHECK ==="
-          echo "Checking asar files:"
-          find "$APP_PATH" -name "*.asar" -exec ls -lh {} \; 2>/dev/null || echo "No asar files found"
-          echo "=== LARGE FILES CHECK ==="
-          echo "Top 20 largest files:"
-          find "$APP_PATH" -type f -exec ls -lh {} \; | sort -hr | head -20
+          echo "📏 DMG size (du -sm): ${DMG_SIZE_MB}MB"
+          echo "📏 DMG size (ls bytes): ${DMG_SIZE_BYTES_MB}MB"
+          echo "📏 DMG file: $(ls -lh "$DMG_FILE")"
           
-          # Remove any source maps or debug files
-          echo "🧹 Cleaning debug files..."
-          find "$APP_PATH" -name "*.map" -delete
-          find "$APP_PATH" -name "*.d.ts" -delete  
-          find "$APP_PATH" -path "*/node_modules/*" -delete 2>/dev/null || true
-          find "$APP_PATH" -name "*.log" -delete 2>/dev/null || true
+          # Use the more reliable size measurement
+          FINAL_SIZE_MB=$DMG_SIZE_MB
           
-          # Force strip debug symbols from binaries
-          echo "🔧 Stripping debug symbols..."
-          find "$APP_PATH" -type f -name "*.dylib" -exec strip -x {} \; 2>/dev/null || true
-          find "$APP_PATH" -type f -perm +111 -exec strip -x {} \; 2>/dev/null || true
-          
-          # Check final size using multiple methods
-          FINAL_SIZE_DU=$(du -s "$APP_PATH" | cut -f1)
-          FINAL_SIZE_MB_DU=$((FINAL_SIZE_DU / 1024))
-          FINAL_SIZE_MB_REAL=$(du -sm "$APP_PATH" | cut -f1)
-          echo "📏 Final app size (du -s method): ${FINAL_SIZE_MB_DU}MB"
-          echo "📏 Final app size (du -sm method): ${FINAL_SIZE_MB_REAL}MB"
-          echo "📏 Final app size (REAL): ${FINAL_SIZE_MB_REAL}MB"
-          
-          # Use the real MB size for comparison
-          FINAL_SIZE_MB=$FINAL_SIZE_MB_REAL
-          
-          # Set STRICT size limits to match local build
-          MAX_SIZE_MB=250  # 严格限制，接近本地231MB
-          MIN_SIZE_MB=200
+          # Set reasonable DMG size limits (DMG files are typically smaller than app bundles)
+          MAX_SIZE_MB=200  # DMG应该比app bundle更小
+          MIN_SIZE_MB=80   # 最小合理大小
           
           echo "🎯 Size limits: ${MIN_SIZE_MB}MB - ${MAX_SIZE_MB}MB"
           
           if [ $FINAL_SIZE_MB -gt $MAX_SIZE_MB ]; then
-            echo "❌ ERROR: App size ${FINAL_SIZE_MB}MB exceeds maximum ${MAX_SIZE_MB}MB!"
-            echo "🔍 Largest files in app:"
-            find "$APP_PATH" -type f -exec ls -lh {} \; | sort -hr | head -10
-            echo "🔍 Directory sizes breakdown:"
-            du -sh "$APP_PATH/Contents/"* 2>/dev/null || echo "Could not show directory breakdown"
-            echo "💡 This app is too large for users to download and use!"
+            echo "❌ ERROR: DMG size ${FINAL_SIZE_MB}MB exceeds maximum ${MAX_SIZE_MB}MB!"
+            echo "🔍 DMG file details:"
+            ls -lh "$DMG_FILE"
+            echo "💡 This DMG is too large for users to download and use!"
             exit 1
           elif [ $FINAL_SIZE_MB -lt $MIN_SIZE_MB ]; then
-            echo "❌ ERROR: App size ${FINAL_SIZE_MB}MB is too small (< ${MIN_SIZE_MB}MB)!"
+            echo "❌ ERROR: DMG size ${FINAL_SIZE_MB}MB is too small (< ${MIN_SIZE_MB}MB)!"
             echo "🔍 This might indicate missing files!"
             exit 1
           else
-            echo "✅ SUCCESS: App size ${FINAL_SIZE_MB}MB is within acceptable range!"
+            echo "✅ SUCCESS: DMG size ${FINAL_SIZE_MB}MB is within acceptable range!"
           fi
           
-          echo "=== 📊 APP SIZE CHECK END ==="
+          echo "=== 📊 DMG SIZE CHECK END ==="
           
       - name: Upload build artifacts (macOS)
         if: matrix.platform == 'darwin'
@@ -275,7 +225,7 @@ jobs:
         with:
           name: B-Markdown-macos-${{ matrix.arch }}
           path: |
-            release/mac*/**/B-Markdown.app
+            release/*.dmg
           if-no-files-found: error
 
   auto-release:
