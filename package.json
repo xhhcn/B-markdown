@@ -75,6 +75,8 @@
       "**/*.{node,dll}"
     ],
     "compression": "maximum",
+    "electronVersion": "28.3.3",
+    "buildDependenciesFromSource": false,
 
     "mac": {
       "target": [

@@ -118,11 +118,16 @@ jobs:
           # Clean release directory before build to avoid conflicts
           rm -rf release/
           
-          # Build for specific architecture
+          # Set environment for consistent builds
+          export NODE_ENV=production
+          export ELECTRON_ENABLE_STACK_DUMPING=false
+          export ELECTRON_ENABLE_LOGGING=false
+          
+          # Build for specific architecture with explicit parameters
           if [ "${{ matrix.arch }}" = "arm64" ]; then
-            npm run build:mac:dir:arm64
+            npm run build:mac:dir:arm64 -- --config.compression=maximum --config.nsis.oneClick=false
           else
-            npm run build:mac:dir:x64
+            npm run build:mac:dir:x64 -- --config.compression=maximum --config.nsis.oneClick=false
           fi
           
           # Fix permissions and apply ad-hoc signing for macOS app
@@ -189,12 +194,26 @@ jobs:
           INITIAL_SIZE_MB=$((INITIAL_SIZE / 1024))
           echo "📏 Initial app size: ${INITIAL_SIZE_MB}MB"
           
+          # Debug: Check what's causing the size difference
+          echo "🔍 Analyzing app contents..."
+          echo "Frameworks directory size:"
+          du -sh "$APP_PATH/Contents/Frameworks/"
+          echo "Helper apps count:"
+          ls -la "$APP_PATH/Contents/Frameworks/" | grep Helper | wc -l
+          echo "Electron Framework size:"
+          ls -lh "$APP_PATH/Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework" || echo "Not found"
+          
           # Remove any source maps or debug files
           echo "🧹 Cleaning debug files..."
           find "$APP_PATH" -name "*.map" -delete
           find "$APP_PATH" -name "*.d.ts" -delete  
           find "$APP_PATH" -path "*/node_modules/*" -delete 2>/dev/null || true
           find "$APP_PATH" -name "*.log" -delete 2>/dev/null || true
+          
+          # Force strip debug symbols from binaries
+          echo "🔧 Stripping debug symbols..."
+          find "$APP_PATH" -type f -name "*.dylib" -exec strip -x {} \; 2>/dev/null || true
+          find "$APP_PATH" -type f -perm +111 -exec strip -x {} \; 2>/dev/null || true
           
           # Check final size
           FINAL_SIZE=$(du -s "$APP_PATH" | cut -f1)
