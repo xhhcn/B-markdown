@@ -115,17 +115,20 @@ jobs:
             echo "Building for Intel (x64)"
           fi
           
-          # Build only the app, not DMG using npm script
-          npm run build:mac:dir
-          
-          # Fix permissions for macOS app
-          if [ -d "release/mac/B-Markdown.app" ]; then
-            chmod +x "release/mac/B-Markdown.app/Contents/MacOS/B-Markdown"
-            echo "Fixed permissions for Intel build"
+          # Build for specific architecture
+          if [ "${{ matrix.arch }}" = "arm64" ]; then
+            npm run build:mac:dir:arm64
+          else
+            npm run build:mac:dir:x64
           fi
-          if [ -d "release/mac-arm64/B-Markdown.app" ]; then
+          
+          # Fix permissions for macOS app based on architecture
+          if [ "${{ matrix.arch }}" = "arm64" ]; then
             chmod +x "release/mac-arm64/B-Markdown.app/Contents/MacOS/B-Markdown"
             echo "Fixed permissions for ARM64 build"
+          else
+            chmod +x "release/mac/B-Markdown.app/Contents/MacOS/B-Markdown"
+            echo "Fixed permissions for Intel build"
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -170,6 +173,9 @@ jobs:
             cd ../..
           fi
           echo "Created ZIP archive for ${{ matrix.arch }}"
+          
+          # Check file size
+          ls -lh "B-Markdown-${{ matrix.arch }}-macos.zip"
           
       - name: Upload build artifacts (macOS)
         if: matrix.platform == 'darwin'

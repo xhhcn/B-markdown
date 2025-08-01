@@ -13,6 +13,8 @@
     "build": "vite build && electron-builder",
     "build:mac": "vite build && electron-builder --mac",
     "build:mac:dir": "vite build && electron-builder --mac --dir",
+    "build:mac:dir:x64": "vite build && electron-builder --mac --x64 --dir",
+    "build:mac:dir:arm64": "vite build && electron-builder --mac --arm64 --dir",
     "build:win": "vite build && electron-builder --win",
     "build:linux": "vite build && electron-builder --linux",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
@@ -69,12 +71,8 @@
     ],
     "extraResources": [
       {
-        "from": "public/",
-        "to": "public/"
-      },
-      {
-        "from": "build/",
-        "to": "build/"
+        "from": "build/icon.icns",
+        "to": "icon.icns"
       }
     ],
     "mac": {
