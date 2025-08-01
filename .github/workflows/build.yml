@@ -115,8 +115,8 @@ jobs:
             echo "Building for Intel (x64)"
           fi
           
-          # Build only the app, not DMG
-          vite build && electron-builder --mac --${{ matrix.arch }} --dir
+          # Build only the app, not DMG using npm script
+          npm run build:mac:dir
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -152,7 +152,7 @@ jobs:
         with:
           name: B-Markdown-macos-${{ matrix.arch }}
           path: |
-            release/mac*/B-Markdown.app
+            release/mac*/**/B-Markdown.app
           if-no-files-found: error
 
   auto-release:
