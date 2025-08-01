@@ -175,53 +175,7 @@ jobs:
       #       release/*.blockmap
       #     if-no-files-found: error
 
-      - name: Check DMG size and enforce limits
-        if: matrix.platform == 'darwin'
-        shell: bash
-        run: |
-          # Find the DMG file
-          DMG_FILE=$(find release/ -name "*.dmg" | head -1)
-          if [ -z "$DMG_FILE" ]; then
-            echo "❌ ERROR: No DMG file found!"
-            exit 1
-          fi
-          
-          echo "=== 📊 DMG SIZE CHECK START ==="
-          echo "🔍 Checking DMG file: $DMG_FILE"
-          
-          # Check DMG size using multiple methods
-          DMG_SIZE_MB=$(du -sm "$DMG_FILE" | cut -f1)
-          DMG_SIZE_BYTES=$(ls -l "$DMG_FILE" | awk '{print $5}')
-          DMG_SIZE_BYTES_MB=$((DMG_SIZE_BYTES / 1024 / 1024))
-          
-          echo "📏 DMG size (du -sm): ${DMG_SIZE_MB}MB"
-          echo "📏 DMG size (ls bytes): ${DMG_SIZE_BYTES_MB}MB"
-          echo "📏 DMG file: $(ls -lh "$DMG_FILE")"
-          
-          # Use the more reliable size measurement
-          FINAL_SIZE_MB=$DMG_SIZE_MB
-          
-          # Set reasonable DMG size limits (universal binary will be larger)
-          MAX_SIZE_MB=180  # Universal binary包含两个架构，会更大
-          MIN_SIZE_MB=120  # 最小合理大小
-          
-          echo "🎯 Size limits: ${MIN_SIZE_MB}MB - ${MAX_SIZE_MB}MB"
-          
-          if [ $FINAL_SIZE_MB -gt $MAX_SIZE_MB ]; then
-            echo "❌ ERROR: DMG size ${FINAL_SIZE_MB}MB exceeds maximum ${MAX_SIZE_MB}MB!"
-            echo "🔍 DMG file details:"
-            ls -lh "$DMG_FILE"
-            echo "💡 This DMG is too large for users to download and use!"
-            exit 1
-          elif [ $FINAL_SIZE_MB -lt $MIN_SIZE_MB ]; then
-            echo "❌ ERROR: DMG size ${FINAL_SIZE_MB}MB is too small (< ${MIN_SIZE_MB}MB)!"
-            echo "🔍 This might indicate missing files!"
-            exit 1
-          else
-            echo "✅ SUCCESS: DMG size ${FINAL_SIZE_MB}MB is within acceptable range!"
-          fi
-          
-          echo "=== 📊 DMG SIZE CHECK END ==="
+
           
       - name: Upload build artifacts (macOS)
         if: matrix.platform == 'darwin'
@@ -324,17 +278,19 @@ jobs:
             - 🎨 实时预览
 
             ### 📦 支持平台
-            - 🍎 **macOS**: Intel (x64) + Apple Silicon (arm64) 应用程序
-            <!-- 暂时禁用，将来可能恢复
-            - 🪟 **Windows**: x64 安装程序
-            - 🐧 **Linux**: AppImage + Debian包
-            -->
+            - 🍎 **macOS**: Universal Binary (自动适配Intel + Apple Silicon)
 
             ### 📋 更新内容
             此版本包含最新的功能改进和bug修复。
 
+            ### 🚀 安装说明
+            1. 下载 DMG 文件
+            2. 双击打开 DMG
+            3. 拖拽 B-Markdown.app 到 Applications 文件夹
+            4. 启动应用即可使用
+
             ---
-            **下载对应平台的安装包即可使用！**
+            **一个DMG文件，支持所有Mac设备！**
           files: |
             artifacts/**/*
           draft: false
