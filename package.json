@@ -1,6 +1,6 @@
 {
   "name": "b-markdown",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "B-Markdown: Professional Markdown Editor with Live Preview and Academic Publishing",
   "main": "dist-electron/main.js",
   "private": true,
