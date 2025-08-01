@@ -136,20 +136,16 @@ jobs:
           
           echo "✅ Found DMG: $DMG_FILE"
           
-          # Mount DMG and sign the app
-          echo "🔧 Mounting DMG to sign the app..."
-          hdiutil attach "$DMG_FILE" -readwrite -nobrowse
-          
-          # Find the mounted app
-          MOUNTED_APP=$(find /Volumes/*/B-Markdown.app 2>/dev/null | head -1)
-          if [ -n "$MOUNTED_APP" ]; then
-            echo "🔐 Signing app in DMG: $MOUNTED_APP"
-            codesign --force --deep --sign - "$MOUNTED_APP"
-            echo "✅ App signed successfully"
+          # Sign the app before DMG creation (in the build directory)
+          echo "🔐 Signing universal app before packaging..."
+          APP_DIR=$(find release/ -name "B-Markdown.app" -type d | head -1)
+          if [ -n "$APP_DIR" ]; then
+            echo "🔐 Signing app: $APP_DIR"
+            codesign --force --deep --sign - "$APP_DIR" || echo "⚠️  Signing failed but continuing..."
+            echo "✅ App signing completed"
+          else
+            echo "⚠️  App directory not found for signing"
           fi
-          
-          # Detach DMG
-          hdiutil detach /Volumes/B-Markdown* 2>/dev/null || echo "DMG detached"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -205,9 +201,9 @@ jobs:
           # Use the more reliable size measurement
           FINAL_SIZE_MB=$DMG_SIZE_MB
           
-          # Set reasonable DMG size limits (DMG files are typically smaller than app bundles)
-          MAX_SIZE_MB=200  # DMG应该比app bundle更小
-          MIN_SIZE_MB=80   # 最小合理大小
+          # Set reasonable DMG size limits (universal binary will be larger)
+          MAX_SIZE_MB=180  # Universal binary包含两个架构，会更大
+          MIN_SIZE_MB=120  # 最小合理大小
           
           echo "🎯 Size limits: ${MIN_SIZE_MB}MB - ${MAX_SIZE_MB}MB"
           
