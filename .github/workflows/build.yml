@@ -71,24 +71,31 @@ jobs:
       - name: Build application (Linux)
         if: matrix.platform == 'linux'
         run: |
-          echo "Linux build: Ensuring all native dependencies are available"
-          npm cache clean --force
-          rm -rf node_modules/.cache || true
-          npm install --force --no-optional
-          npm install @rollup/rollup-linux-x64-gnu --no-save
+          echo "Linux build: Installing platform-specific rollup binaries"
+          npm install @rollup/rollup-linux-x64-gnu --no-save --force
           npm run build:linux
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build application (Windows)
         if: matrix.platform == 'win32'
-        run: npm run build:win
+        run: |
+          echo "Windows build: Installing platform-specific rollup binaries"
+          npm install @rollup/rollup-win32-x64-msvc --no-save --force
+          npm run build:win
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build application (macOS)
         if: matrix.platform == 'darwin'
-        run: npm run build:mac
+        run: |
+          echo "macOS build: Installing platform-specific rollup binaries"
+          if [ "${{ matrix.arch }}" = "arm64" ]; then
+            npm install @rollup/rollup-darwin-arm64 --no-save --force
+          else
+            npm install @rollup/rollup-darwin-x64 --no-save --force
+          fi
+          npm run build:mac
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
