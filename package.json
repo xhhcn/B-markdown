@@ -82,13 +82,18 @@
         {
           "target": "dmg",
           "arch": [
-            "x64",
+            "x64", 
             "arm64"
           ]
         }
       ],
       "icon": "build/icon.icns",
-      "category": "public.app-category.productivity"
+      "category": "public.app-category.productivity",
+      "identity": null,
+      "entitlements": null,
+      "entitlementsInherit": null,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
     },
     "win": {
       "target": [

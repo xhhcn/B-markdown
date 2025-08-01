@@ -117,6 +117,16 @@ jobs:
           
           # Build only the app, not DMG using npm script
           npm run build:mac:dir
+          
+          # Fix permissions for macOS app
+          if [ -d "release/mac/B-Markdown.app" ]; then
+            chmod +x "release/mac/B-Markdown.app/Contents/MacOS/B-Markdown"
+            echo "Fixed permissions for Intel build"
+          fi
+          if [ -d "release/mac-arm64/B-Markdown.app" ]; then
+            chmod +x "release/mac-arm64/B-Markdown.app/Contents/MacOS/B-Markdown"
+            echo "Fixed permissions for ARM64 build"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -146,13 +156,28 @@ jobs:
       #       release/*.blockmap
       #     if-no-files-found: error
 
+      - name: Create ZIP archive for macOS app
+        if: matrix.platform == 'darwin'
+        shell: bash
+        run: |
+          if [ "${{ matrix.arch }}" = "arm64" ]; then
+            cd release/mac-arm64
+            zip -r "../../B-Markdown-${{ matrix.arch }}-macos.zip" "B-Markdown.app"
+            cd ../..
+          else
+            cd release/mac
+            zip -r "../../B-Markdown-${{ matrix.arch }}-macos.zip" "B-Markdown.app"
+            cd ../..
+          fi
+          echo "Created ZIP archive for ${{ matrix.arch }}"
+          
       - name: Upload build artifacts (macOS)
         if: matrix.platform == 'darwin'
         uses: actions/upload-artifact@v4
         with:
           name: B-Markdown-macos-${{ matrix.arch }}
           path: |
-            release/mac*/**/B-Markdown.app
+            B-Markdown-${{ matrix.arch }}-macos.zip
           if-no-files-found: error
 
   auto-release:
