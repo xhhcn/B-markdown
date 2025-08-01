@@ -25,6 +25,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
+        shell: bash
         run: |
           echo "All platforms: Using npm install to avoid rollup native dependency issues"
           rm -rf node_modules package-lock.json
@@ -69,6 +70,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
+        shell: bash
         run: |
           echo "All platforms: Using npm install to avoid rollup native dependency issues"
           rm -rf node_modules package-lock.json
