@@ -59,10 +59,7 @@ jobs:
           #   arch: x64
           - os: macos-latest
             platform: darwin
-            arch: x64
-          - os: macos-latest
-            platform: darwin
-            arch: arm64
+            arch: universal
         
     steps:
       - name: Checkout code
@@ -123,14 +120,10 @@ jobs:
           export ELECTRON_ENABLE_STACK_DUMPING=false
           export ELECTRON_ENABLE_LOGGING=false
           
-          # Build DMG for specific architecture 
-          if [ "${{ matrix.arch }}" = "arm64" ]; then
-            npm run build:mac:arm64
-          else
-            npm run build:mac:x64
-          fi
+          # Build universal DMG
+          npm run build:mac
           
-          # Check DMG files instead of app
+          # Check DMG files and sign the app inside
           echo "🔍 Looking for DMG files..."
           ls -la release/
           
@@ -142,6 +135,21 @@ jobs:
           fi
           
           echo "✅ Found DMG: $DMG_FILE"
+          
+          # Mount DMG and sign the app
+          echo "🔧 Mounting DMG to sign the app..."
+          hdiutil attach "$DMG_FILE" -readwrite -nobrowse
+          
+          # Find the mounted app
+          MOUNTED_APP=$(find /Volumes/*/B-Markdown.app 2>/dev/null | head -1)
+          if [ -n "$MOUNTED_APP" ]; then
+            echo "🔐 Signing app in DMG: $MOUNTED_APP"
+            codesign --force --deep --sign - "$MOUNTED_APP"
+            echo "✅ App signed successfully"
+          fi
+          
+          # Detach DMG
+          hdiutil detach /Volumes/B-Markdown* 2>/dev/null || echo "DMG detached"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -223,7 +231,7 @@ jobs:
         if: matrix.platform == 'darwin'
         uses: actions/upload-artifact@v4
         with:
-          name: B-Markdown-macos-${{ matrix.arch }}
+          name: B-Markdown-macos-universal
           path: |
             release/*.dmg
           if-no-files-found: error
