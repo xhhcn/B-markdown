@@ -66,8 +66,7 @@
     },
     "files": [
       "dist/**/*",
-      "dist-electron/**/*",
-      "public/**/*"
+      "dist-electron/**/*"
     ],
 
     "mac": {
@@ -86,7 +85,8 @@
       "entitlements": null,
       "entitlementsInherit": null,
       "hardenedRuntime": false,
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "type": "distribution"
     },
     "win": {
       "target": [

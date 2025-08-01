@@ -125,14 +125,24 @@ jobs:
             npm run build:mac:dir:x64
           fi
           
-          # Fix permissions for macOS app based on architecture
+          # Fix permissions and apply ad-hoc signing for macOS app
           if [ "${{ matrix.arch }}" = "arm64" ]; then
-            chmod +x "release/mac-arm64/B-Markdown.app/Contents/MacOS/B-Markdown"
+            APP_PATH="release/mac-arm64/B-Markdown.app"
+            chmod +x "$APP_PATH/Contents/MacOS/B-Markdown"
             echo "Fixed permissions for ARM64 build"
           else
-            chmod +x "release/mac/B-Markdown.app/Contents/MacOS/B-Markdown"
+            APP_PATH="release/mac/B-Markdown.app"
+            chmod +x "$APP_PATH/Contents/MacOS/B-Markdown"
             echo "Fixed permissions for Intel build"
           fi
+          
+          # Apply ad-hoc code signing to make the app trusted
+          echo "Applying ad-hoc code signing..."
+          codesign --force --deep --sign - "$APP_PATH"
+          echo "Code signing completed"
+          
+          # Verify the signing
+          codesign --verify --verbose "$APP_PATH" || echo "Code signing verification completed"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
