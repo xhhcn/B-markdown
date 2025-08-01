@@ -50,12 +50,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            platform: linux
-            arch: x64
-          - os: windows-latest
-            platform: win32
-            arch: x64
+          # Temporarily disabled - uncomment when needed
+          # - os: ubuntu-latest
+          #   platform: linux
+          #   arch: x64
+          # - os: windows-latest
+          #   platform: win32
+          #   arch: x64
           - os: macos-latest
             platform: darwin
             arch: x64
@@ -80,25 +81,26 @@ jobs:
           rm -rf node_modules package-lock.json
           npm install
 
-      - name: Build application (Linux)
-        if: matrix.platform == 'linux'
-        shell: bash
-        run: |
-          echo "Linux build: Installing platform-specific rollup binaries"
-          npm install @rollup/rollup-linux-x64-gnu --no-save --force
-          npm run build:linux
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Temporarily disabled - uncomment when needed
+      # - name: Build application (Linux)
+      #   if: matrix.platform == 'linux'
+      #   shell: bash
+      #   run: |
+      #     echo "Linux build: Installing platform-specific rollup binaries"
+      #     npm install @rollup/rollup-linux-x64-gnu --no-save --force
+      #     npm run build:linux
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build application (Windows)
-        if: matrix.platform == 'win32'
-        shell: bash
-        run: |
-          echo "Windows build: Installing platform-specific rollup binaries"
-          npm install @rollup/rollup-win32-x64-msvc --no-save --force
-          npm run build:win
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Build application (Windows)
+      #   if: matrix.platform == 'win32'
+      #   shell: bash
+      #   run: |
+      #     echo "Windows build: Installing platform-specific rollup binaries"
+      #     npm install @rollup/rollup-win32-x64-msvc --no-save --force
+      #     npm run build:win
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build application (macOS)
         if: matrix.platform == 'darwin'
@@ -107,10 +109,14 @@ jobs:
           echo "macOS build: Installing platform-specific rollup binaries"
           if [ "${{ matrix.arch }}" = "arm64" ]; then
             npm install @rollup/rollup-darwin-arm64 --no-save --force
+            echo "Building for Apple Silicon (arm64)"
           else
-            npm install @rollup/rollup-darwin-x64 --no-save --force
+            npm install @rollup/rollup-darwin-x64 --no-save --force  
+            echo "Building for Intel (x64)"
           fi
-          npm run build:mac
+          
+          # Build only the app, not DMG
+          vite build && electron-builder --mac --${{ matrix.arch }} --dir
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -118,26 +124,27 @@ jobs:
         shell: bash
         run: ls -la release/
 
-      - name: Upload build artifacts (Linux)
-        if: matrix.platform == 'linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: B-Markdown-linux-${{ matrix.arch }}
-          path: |
-            release/*.AppImage
-            release/*.deb
-            release/*.blockmap
-          if-no-files-found: error
+      # Temporarily disabled - uncomment when needed
+      # - name: Upload build artifacts (Linux)
+      #   if: matrix.platform == 'linux'
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: B-Markdown-linux-${{ matrix.arch }}
+      #     path: |
+      #       release/*.AppImage
+      #       release/*.deb
+      #       release/*.blockmap
+      #     if-no-files-found: error
 
-      - name: Upload build artifacts (Windows)
-        if: matrix.platform == 'win32'
-        uses: actions/upload-artifact@v4
-        with:
-          name: B-Markdown-windows-${{ matrix.arch }}
-          path: |
-            release/*.exe
-            release/*.blockmap
-          if-no-files-found: error
+      # - name: Upload build artifacts (Windows)
+      #   if: matrix.platform == 'win32'
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: B-Markdown-windows-${{ matrix.arch }}
+      #     path: |
+      #       release/*.exe
+      #       release/*.blockmap
+      #     if-no-files-found: error
 
       - name: Upload build artifacts (macOS)
         if: matrix.platform == 'darwin'
@@ -145,8 +152,7 @@ jobs:
         with:
           name: B-Markdown-macos-${{ matrix.arch }}
           path: |
-            release/*.dmg
-            release/*.blockmap
+            release/mac*/B-Markdown.app
           if-no-files-found: error
 
   auto-release:
@@ -241,9 +247,11 @@ jobs:
             - 🎨 实时预览
 
             ### 📦 支持平台
-            - 🍎 **macOS**: Intel (x64) + Apple Silicon (arm64)
+            - 🍎 **macOS**: Intel (x64) + Apple Silicon (arm64) 应用程序
+            <!-- 暂时禁用，将来可能恢复
             - 🪟 **Windows**: x64 安装程序
             - 🐧 **Linux**: AppImage + Debian包
+            -->
 
             ### 📋 更新内容
             此版本包含最新的功能改进和bug修复。
