@@ -149,14 +149,71 @@ jobs:
             release/*.blockmap
           if-no-files-found: error
 
-  release:
+  auto-release:
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Get latest tag
+        id: get-latest-tag
+        shell: bash
+        run: |
+          # 获取最新的tag，如果没有则从v1.0.0开始
+          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "latest_tag=$latest_tag" >> $GITHUB_OUTPUT
+          echo "Latest tag: $latest_tag"
+          
+      - name: Calculate next version
+        id: next-version
+        shell: bash
+        run: |
+          latest_tag="${{ steps.get-latest-tag.outputs.latest_tag }}"
+          
+          # 如果是v0.0.0（表示没有tag），则从v1.0.0开始
+          if [ "$latest_tag" = "v0.0.0" ]; then
+            next_version="v1.0.0"
+          else
+            # 解析版本号并递增patch版本
+            version_without_v="${latest_tag#v}"
+            IFS='.' read -r major minor patch <<< "$version_without_v"
+            patch=$((patch + 1))
+            next_version="v${major}.${minor}.${patch}"
+          fi
+          
+          echo "next_version=$next_version" >> $GITHUB_OUTPUT
+          echo "Next version: $next_version"
+          
+      - name: Update package.json version
+        shell: bash
+        run: |
+          next_version="${{ steps.next-version.outputs.next_version }}"
+          version_without_v="${next_version#v}"
+          sed -i "s/\"version\": \".*\"/\"version\": \"$version_without_v\"/" package.json
+          echo "Updated package.json to version $version_without_v"
+          
+      - name: Commit version change
+        shell: bash
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add package.json
+          git commit -m "chore: bump version to ${{ steps.next-version.outputs.next_version }}" || exit 0
+          
+      - name: Create and push tag
+        shell: bash
+        run: |
+          next_version="${{ steps.next-version.outputs.next_version }}"
+          git tag -a "$next_version" -m "Release $next_version"
+          git push origin main
+          git push origin "$next_version"
+          echo "Created and pushed tag: $next_version"
         
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -170,10 +227,33 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: ${{ steps.next-version.outputs.next_version }}
+          name: "B-Markdown ${{ steps.next-version.outputs.next_version }}"
+          body: |
+            ## 🎉 B-Markdown ${{ steps.next-version.outputs.next_version }} 发布
+
+            ### ✨ 特性
+            - 💻 专业的Markdown编辑器
+            - 🧮 完整的数学公式支持 (KaTeX)
+            - 📄 PDF导出 (Default/Academic主题)
+            - 🌐 中英文国际化
+            - 🔍 搜索和替换功能
+            - 🎨 实时预览
+
+            ### 📦 支持平台
+            - 🍎 **macOS**: Intel (x64) + Apple Silicon (arm64)
+            - 🪟 **Windows**: x64 安装程序
+            - 🐧 **Linux**: AppImage + Debian包
+
+            ### 📋 更新内容
+            此版本包含最新的功能改进和bug修复。
+
+            ---
+            **下载对应平台的安装包即可使用！**
           files: |
             artifacts/**/*
           draft: false
           prerelease: false
-          generate_release_notes: true
+          generate_release_notes: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
