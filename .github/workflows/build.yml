@@ -189,9 +189,12 @@ jobs:
           
           echo "=== 📊 APP SIZE CHECK START ==="
           
-          # Check initial size
-          INITIAL_SIZE=$(du -s "$APP_PATH" | cut -f1)
-          INITIAL_SIZE_MB=$((INITIAL_SIZE / 1024))
+          # Check initial size using multiple methods
+          INITIAL_SIZE_DU=$(du -s "$APP_PATH" | cut -f1)
+          INITIAL_SIZE_MB_DU=$((INITIAL_SIZE_DU / 1024))
+          INITIAL_SIZE_MB_REAL=$(du -sm "$APP_PATH" | cut -f1)
+          echo "📏 Initial app size (du -s method): ${INITIAL_SIZE_MB_DU}MB"
+          echo "📏 Initial app size (du -sm method): ${INITIAL_SIZE_MB_REAL}MB"
           echo "📏 Initial app size: ${INITIAL_SIZE_MB}MB"
           
           # Debug: Check what's causing the size difference
@@ -212,6 +215,12 @@ jobs:
           echo "=== HIDDEN FILES CHECK ==="
           echo "Looking for hidden or unusual files:"
           find "$APP_PATH" -name ".*" -type f -exec ls -lh {} \; 2>/dev/null | head -5 || echo "No hidden files found"
+          echo "=== ASAR FILE CHECK ==="
+          echo "Checking asar files:"
+          find "$APP_PATH" -name "*.asar" -exec ls -lh {} \; 2>/dev/null || echo "No asar files found"
+          echo "=== LARGE FILES CHECK ==="
+          echo "Top 20 largest files:"
+          find "$APP_PATH" -type f -exec ls -lh {} \; | sort -hr | head -20
           
           # Remove any source maps or debug files
           echo "🧹 Cleaning debug files..."
@@ -225,13 +234,19 @@ jobs:
           find "$APP_PATH" -type f -name "*.dylib" -exec strip -x {} \; 2>/dev/null || true
           find "$APP_PATH" -type f -perm +111 -exec strip -x {} \; 2>/dev/null || true
           
-          # Check final size
-          FINAL_SIZE=$(du -s "$APP_PATH" | cut -f1)
-          FINAL_SIZE_MB=$((FINAL_SIZE / 1024))
-          echo "📏 Final app size: ${FINAL_SIZE_MB}MB"
+          # Check final size using multiple methods
+          FINAL_SIZE_DU=$(du -s "$APP_PATH" | cut -f1)
+          FINAL_SIZE_MB_DU=$((FINAL_SIZE_DU / 1024))
+          FINAL_SIZE_MB_REAL=$(du -sm "$APP_PATH" | cut -f1)
+          echo "📏 Final app size (du -s method): ${FINAL_SIZE_MB_DU}MB"
+          echo "📏 Final app size (du -sm method): ${FINAL_SIZE_MB_REAL}MB"
+          echo "📏 Final app size (REAL): ${FINAL_SIZE_MB_REAL}MB"
           
-          # Set acceptable size limits (CI环境存在差异，适当放宽限制)
-          MAX_SIZE_MB=500
+          # Use the real MB size for comparison
+          FINAL_SIZE_MB=$FINAL_SIZE_MB_REAL
+          
+          # Set STRICT size limits to match local build
+          MAX_SIZE_MB=250  # 严格限制，接近本地231MB
           MIN_SIZE_MB=200
           
           echo "🎯 Size limits: ${MIN_SIZE_MB}MB - ${MAX_SIZE_MB}MB"
