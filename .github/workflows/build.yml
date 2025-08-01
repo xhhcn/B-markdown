@@ -7,6 +7,10 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: write
+  actions: read
+
 env:
   # 强制在GitHub Actions中使用最新的Node.js和npm
   NODE_VERSION: '18'
