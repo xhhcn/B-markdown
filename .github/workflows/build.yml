@@ -172,23 +172,26 @@ jobs:
       #       release/*.blockmap
       #     if-no-files-found: error
 
-      - name: Create ZIP archive for macOS app
+      - name: Check app size and optimize
         if: matrix.platform == 'darwin'
         shell: bash
         run: |
           if [ "${{ matrix.arch }}" = "arm64" ]; then
-            cd release/mac-arm64
-            zip -r "../../B-Markdown-${{ matrix.arch }}-macos.zip" "B-Markdown.app"
-            cd ../..
+            APP_PATH="release/mac-arm64/B-Markdown.app"
           else
-            cd release/mac
-            zip -r "../../B-Markdown-${{ matrix.arch }}-macos.zip" "B-Markdown.app"
-            cd ../..
+            APP_PATH="release/mac/B-Markdown.app"
           fi
-          echo "Created ZIP archive for ${{ matrix.arch }}"
           
-          # Check file size
-          ls -lh "B-Markdown-${{ matrix.arch }}-macos.zip"
+          echo "Checking app size before optimization:"
+          du -sh "$APP_PATH"
+          
+          # Remove any source maps or debug files
+          find "$APP_PATH" -name "*.map" -delete
+          find "$APP_PATH" -name "*.d.ts" -delete
+          find "$APP_PATH" -path "*/node_modules/*" -delete 2>/dev/null || true
+          
+          echo "App size after optimization:"
+          du -sh "$APP_PATH"
           
       - name: Upload build artifacts (macOS)
         if: matrix.platform == 'darwin'
@@ -196,7 +199,7 @@ jobs:
         with:
           name: B-Markdown-macos-${{ matrix.arch }}
           path: |
-            B-Markdown-${{ matrix.arch }}-macos.zip
+            release/mac*/**/B-Markdown.app
           if-no-files-found: error
 
   auto-release:
