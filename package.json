@@ -77,6 +77,8 @@
     "compression": "maximum",
     "electronVersion": "28.3.3",
     "buildDependenciesFromSource": false,
+    "includeSubNodeModules": false,
+    "removePackageScripts": true,
 
     "mac": {
       "target": [
