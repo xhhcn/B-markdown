@@ -76,6 +76,7 @@ jobs:
 
       - name: Build application (Linux)
         if: matrix.platform == 'linux'
+        shell: bash
         run: |
           echo "Linux build: Installing platform-specific rollup binaries"
           npm install @rollup/rollup-linux-x64-gnu --no-save --force
@@ -85,6 +86,7 @@ jobs:
 
       - name: Build application (Windows)
         if: matrix.platform == 'win32'
+        shell: bash
         run: |
           echo "Windows build: Installing platform-specific rollup binaries"
           npm install @rollup/rollup-win32-x64-msvc --no-save --force
@@ -94,6 +96,7 @@ jobs:
 
       - name: Build application (macOS)
         if: matrix.platform == 'darwin'
+        shell: bash
         run: |
           echo "macOS build: Installing platform-specific rollup binaries"
           if [ "${{ matrix.arch }}" = "arm64" ]; then
