@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { EditorView } from '@codemirror/view'
+import t from '../i18n'
 
 interface SearchOverlayProps {
   isVisible: boolean
@@ -14,10 +15,11 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
   onClose, 
   editorView 
 }) => {
+  const i18n = t() // 获取国际化文本
   const [searchTerm, setSearchTerm] = useState('')
   const [replaceTerm, setReplaceTerm] = useState('')
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0)
-  const [, setTotalMatches] = useState(0)
+  const [totalMatches, setTotalMatches] = useState(0)
   
   const searchInputRef = useRef<HTMLInputElement>(null)
   const replaceInputRef = useRef<HTMLInputElement>(null)
@@ -221,7 +223,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
         <input
           ref={searchInputRef}
           type="text"
-          placeholder="查找..."
+                      placeholder={i18n.searchPlaceholder}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -232,7 +234,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
           <input
             ref={replaceInputRef}
             type="text"
-            placeholder="替换为..."
+            placeholder={i18n.replacePlaceholder}
             value={replaceTerm}
             onChange={(e) => setReplaceTerm(e.target.value)}
             onKeyDown={handleKeyDown}

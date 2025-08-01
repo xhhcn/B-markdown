@@ -1,4 +1,5 @@
 import React from 'react'
+import t from '../i18n'
 
 interface ProgressDialogProps {
   isVisible: boolean
@@ -11,12 +12,14 @@ const ProgressDialog: React.FC<ProgressDialogProps> = ({
   progress, 
   message 
 }) => {
+  const i18n = t() // 获取国际化文本
+  
   if (!isVisible) return null
 
   return (
     <div className="progress-overlay">
       <div className="progress-dialog">
-        <h3>导出PDF</h3>
+        <h3>{i18n.exportPdf}</h3>
         <div className="progress-bar-container">
           <div 
             className="progress-bar" 

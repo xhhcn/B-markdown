@@ -1,126 +1,145 @@
-name: Build Multi-Platform
+name: Build and Release B-Markdown
 
 on:
   push:
-    tags:
-      - 'v*'
-    branches:
-      - main
+    branches: [ main ]
+    tags: [ 'v*' ]
   pull_request:
-    branches:
-      - main
-  workflow_dispatch:
+    branches: [ main ]
 
-permissions:
-  contents: write
-  actions: read
-  checks: write
+env:
+  # 强制在GitHub Actions中使用最新的Node.js和npm
+  NODE_VERSION: '18'
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run type check
+        run: npx tsc --noEmit
+
   build:
+    needs: test
     runs-on: ${{ matrix.os }}
     
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: macos-latest
-            platform: mac
-          - os: windows-latest  
-            platform: win
           - os: ubuntu-latest
             platform: linux
-    
+            arch: x64
+          - os: windows-latest
+            platform: win32
+            arch: x64
+          - os: macos-latest
+            platform: darwin
+            arch: x64
+          - os: macos-latest
+            platform: darwin
+            arch: arm64
+        
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Clean build artifacts (Unix)
-      if: runner.os != 'Windows'
-      run: |
-        rm -rf dist dist-electron release
-        find . -name "*.d.ts" -not -path "./node_modules/*" -delete || true
-        
-    - name: Clean build artifacts (Windows)
-      if: runner.os == 'Windows'
-      run: |
-        if (Test-Path dist) { Remove-Item -Recurse -Force dist }
-        if (Test-Path dist-electron) { Remove-Item -Recurse -Force dist-electron }
-        if (Test-Path release) { Remove-Item -Recurse -Force release }
-        Get-ChildItem -Path . -Name "*.d.ts" -Recurse | Where-Object { $_ -notlike "*node_modules*" } | Remove-Item -Force
-      shell: pwsh
-      
-    - name: Build application
-      run: npm run build:${{ matrix.platform }}
-      env:
-        CI: true
-        
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: B-Markdown-${{ matrix.platform }}-${{ github.sha }}
-        path: |
-          release/
-          !release/**/*.blockmap
-        retention-days: 30
-        
-    - name: Create Release (on tag)
-      if: startsWith(github.ref, 'refs/tags/v') && matrix.platform == 'linux'
-      uses: softprops/action-gh-release@v2
-      with:
-        files: |
-          release/*.dmg
-          release/*.zip
-          release/*.exe
-          release/*.AppImage
-          release/*.tar.gz
-        draft: false
-        prerelease: false
-        generate_release_notes: true
-        fail_on_unmatched_files: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  # 收集所有构建产物
-  collect-artifacts:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application (Linux)
+        if: matrix.platform == 'linux'
+        run: npm run build:linux
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build application (Windows)
+        if: matrix.platform == 'win32'
+        run: npm run build:win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build application (macOS)
+        if: matrix.platform == 'darwin'
+        run: npm run build:mac
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: List build outputs
+        run: ls -la release/
+
+      - name: Upload build artifacts (Linux)
+        if: matrix.platform == 'linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: B-Markdown-linux-${{ matrix.arch }}
+          path: |
+            release/*.AppImage
+            release/*.deb
+            release/*.blockmap
+          if-no-files-found: error
+
+      - name: Upload build artifacts (Windows)
+        if: matrix.platform == 'win32'
+        uses: actions/upload-artifact@v4
+        with:
+          name: B-Markdown-windows-${{ matrix.arch }}
+          path: |
+            release/*.exe
+            release/*.blockmap
+          if-no-files-found: error
+
+      - name: Upload build artifacts (macOS)
+        if: matrix.platform == 'darwin'
+        uses: actions/upload-artifact@v4
+        with:
+          name: B-Markdown-macos-${{ matrix.arch }}
+          path: |
+            release/*.dmg
+            release/*.blockmap
+          if-no-files-found: error
+
+  release:
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/')
     
     steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: artifacts
+      - name: Checkout code
+        uses: actions/checkout@v4
         
-    - name: Display artifacts
-      run: |
-        echo "## 📦 Build Artifacts" >> $GITHUB_STEP_SUMMARY
-        echo "✅ Multi-platform build completed successfully" >> $GITHUB_STEP_SUMMARY
-        find artifacts -name "*.dmg" -o -name "*.zip" -o -name "*.exe" -o -name "*.AppImage" -o -name "*.tar.gz" | sort >> $GITHUB_STEP_SUMMARY
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
         
-    - name: Create unified release
-      if: startsWith(github.ref, 'refs/tags/v')
-      uses: softprops/action-gh-release@v2
-      with:
-        files: |
-          artifacts/**/*.dmg
-          artifacts/**/*.zip
-          artifacts/**/*.exe
-          artifacts/**/*.AppImage
-          artifacts/**/*.tar.gz
-        draft: false
-        prerelease: false
-        generate_release_notes: true
-        fail_on_unmatched_files: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Display structure of downloaded files
+        run: ls -la artifacts/
+        
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/**/*
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

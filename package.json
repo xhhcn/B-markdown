@@ -1,7 +1,7 @@
 {
-  "name": "markdown-editor",
+  "name": "b-markdown",
   "version": "1.0.0",
-  "description": "Electron-based Markdown Editor with Live Preview",
+  "description": "B-Markdown: Professional Markdown Editor with Live Preview and Academic Publishing",
   "main": "dist-electron/main.js",
   "private": true,
   "author": "Your Name",
@@ -11,8 +11,7 @@
     "build:mac": "vite build && electron-builder --mac",
     "build:win": "vite build && electron-builder --win",
     "build:linux": "vite build && electron-builder --linux",
-    "build:all": "vite build && electron-builder --mac --win --linux",
-    "electron:dev": "npm run dev",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
     "electron:pack": "electron-builder",
     "preview": "vite preview"
   },
@@ -21,11 +20,16 @@
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "concurrently": "^8.2.2",
     "electron": "^28.1.0",
     "electron-builder": "^24.9.1",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.3.6",
     "typescript": "^5.2.2",
     "vite": "^5.0.8",
-    "vite-plugin-electron": "^0.15.5"
+    "vite-plugin-electron": "^0.15.5",
+    "wait-on": "^7.2.0"
   },
   "dependencies": {
     "@codemirror/lang-markdown": "^6.2.4",
@@ -40,7 +44,9 @@
     "rehype-highlight": "^7.0.2",
     "rehype-katex": "^7.0.1",
     "rehype-stringify": "^10.0.1",
+    "remark": "^15.0.1",
     "remark-gfm": "^4.0.0",
+    "remark-html": "^16.0.1",
     "remark-math": "^6.0.0",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
@@ -50,84 +56,61 @@
     "appId": "com.example.b-markdown",
     "productName": "B-Markdown",
     "directories": {
-      "output": "release",
-      "buildResources": "build"
+      "output": "release"
     },
     "files": [
       "dist/**/*",
       "dist-electron/**/*",
-      "!dist/**/*.map",
-      "!**/.DS_Store"
+      "public/**/*"
     ],
-    "extraMetadata": {
-      "main": "dist-electron/main.js"
-    },
-    "compression": "maximum",
-    "removePackageScripts": true,
+    "extraResources": [
+      {
+        "from": "public/",
+        "to": "public/"
+      },
+      {
+        "from": "build/",
+        "to": "build/"
+      }
+    ],
     "mac": {
-      "icon": "build/icon.icns",
-      "category": "public.app-category.productivity",
       "target": [
         {
           "target": "dmg",
           "arch": ["x64", "arm64"]
-        },
-        {
-          "target": "zip",
-          "arch": ["x64", "arm64"]
         }
-      ]
+      ],
+      "icon": "build/icon.icns",
+      "category": "public.app-category.productivity"
     },
     "win": {
-      "icon": "build/icon.icns",
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64", "arm64"]
-        },
-        {
-          "target": "zip",
-          "arch": ["x64", "arm64"]
+          "arch": ["x64"]
         }
-      ]
+      ],
+      "icon": "build/icon.ico"
     },
     "linux": {
-      "icon": "build/icon.icns",
-      "category": "Office",
       "target": [
         {
           "target": "AppImage",
-          "arch": ["x64", "arm64"]
+          "arch": ["x64"]
         },
         {
-          "target": "tar.gz",
-          "arch": ["x64", "arm64"]
+          "target": "deb",
+          "arch": ["x64"]
         }
-      ]
+      ],
+      "icon": "build/icon.png",
+      "category": "Office"
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
-    },
-    "dmg": {
-      "title": "${productName} ${version}",
-      "icon": "build/icon.icns",
-      "window": {
-        "width": 660,
-        "height": 400
-      },
-      "contents": [
-        {
-          "x": 180,
-          "y": 170
-        },
-        {
-          "x": 480,
-          "y": 170,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ]
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
     }
   }
 }

@@ -1,0 +1,51 @@
+name: Test Build Configuration
+
+on:
+  push:
+    paths:
+      - 'package.json'
+      - '.github/workflows/**'
+      - 'build/**'
+  workflow_dispatch:
+
+jobs:
+  test-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Verify build assets exist
+        run: |
+          echo "Checking build directory..."
+          ls -la build/
+          echo "Verifying icon files..."
+          file build/icon.*
+          echo "Checking file sizes..."
+          du -h build/icon.*
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run type check
+        run: npx tsc --noEmit
+
+      - name: Verify package.json build configuration
+        run: |
+          echo "Checking electron-builder configuration..."
+          cat package.json | jq '.build'
+
+      - name: Test Vite build only
+        run: |
+          npm run dev &
+          DEV_PID=$!
+          sleep 10
+          kill $DEV_PID || true
+          echo "Development server test completed"

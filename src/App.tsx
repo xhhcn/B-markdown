@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import './types/global'
 import CodeMirror from '@uiw/react-codemirror'
 import { markdown as markdownLang } from '@codemirror/lang-markdown'
 import { oneDark } from '@codemirror/theme-one-dark'
@@ -17,6 +16,7 @@ import remarkRehype from 'remark-rehype'
 import rehypeKatex from 'rehype-katex'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeStringify from 'rehype-stringify'
+import t from './i18n'
 
 
 const initialMarkdown = ''
@@ -87,8 +87,8 @@ const transparentTheme = EditorView.theme({
 })
 
 function App() {
+  const i18n = t() // 获取国际化文本
   const [markdownContent, setMarkdownContent] = useState(initialMarkdown)
-  const [debouncedContent, setDebouncedContent] = useState(initialMarkdown)
   const [currentFilePath, setCurrentFilePath] = useState<string | null>(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   
@@ -103,6 +103,10 @@ function App() {
   const [exportProgress, setExportProgress] = useState(0)
   const [exportMessage, setExportMessage] = useState('')
   
+  // PDF导出主题选择状态
+  const [showThemeDialog, setShowThemeDialog] = useState(false)
+  const [selectedTheme, setSelectedTheme] = useState<'default' | 'academic'>('default')
+  
 
 
   // 同步未保存状态到全局变量，供主进程访问
@@ -115,7 +119,7 @@ function App() {
   const isResizing = useRef(false)
   const editorViewRef = useRef<EditorView | null>(null)
 
-  // 动态gutter宽度计算 - 减少频繁更新
+  // 动态gutter宽度计算
   useEffect(() => {
     const updateGutterWidth = () => {
       if (editorRef.current) {
@@ -126,11 +130,16 @@ function App() {
         }
       }
     }
-    const timer = setTimeout(updateGutterWidth, 200)
+    const timer = setTimeout(updateGutterWidth, 100)
+    const observer = new MutationObserver(updateGutterWidth)
+    if (editorRef.current) {
+      observer.observe(editorRef.current, { childList: true, subtree: true })
+    }
     return () => {
       clearTimeout(timer)
+      observer.disconnect()
     }
-  }, [editorKey]) // 只在编辑器重新创建时更新
+  }, [markdownContent])
 
   // 文件操作函数
 
@@ -141,26 +150,17 @@ function App() {
 
   // handleSaveAsFile逻辑已经内联到菜单事件处理器中
 
-  // 防抖处理，延迟更新预览内容
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedContent(markdownContent)
-    }, 150) // 150ms 防抖延迟
-
-    return () => clearTimeout(timer)
-  }, [markdownContent])
-
-  // 监听文件内容变化 - 使用useCallback优化
-  const handleContentChange = useCallback((value: string) => {
+  // 监听文件内容变化
+  const handleContentChange = (value: string) => {
     setMarkdownContent(value)
     setHasUnsavedChanges(true)
-  }, [])
+  }
 
-  // 清除编辑器历史记录 - 使用useCallback优化
-  const clearEditorHistory = useCallback(() => {
+  // 清除编辑器历史记录
+  const clearEditorHistory = () => {
     // 通过改变key来强制重新渲染CodeMirror组件，这会清除所有历史记录
     setEditorKey(prev => prev + 1)
-  }, [])
+  }
 
 
 
@@ -169,7 +169,7 @@ function App() {
     // 使用ref来获取最新的状态
     if (hasUnsavedChangesRef.current && window.electronAPI) {
       try {
-        const choice = await window.electronAPI.showUnsavedChangesDialog('新建文件')
+        const choice = await window.electronAPI.showUnsavedChangesDialog('newFile')
         
         if (choice === 0) {
           // 用户选择保存
@@ -192,13 +192,12 @@ function App() {
           return
         }
       } catch (error) {
-        console.error('Error showing unsaved changes dialog:', error)
+        // 错误处理，但不输出到控制台
         return
       }
     }
 
     setMarkdownContent('')
-    setDebouncedContent('')
     setCurrentFilePath(null)
     setHasUnsavedChanges(false)
     setShowWelcome(false)
@@ -210,7 +209,7 @@ function App() {
     // 使用ref来获取最新的状态
     if (hasUnsavedChangesRef.current && window.electronAPI) {
       try {
-        const choice = await window.electronAPI.showUnsavedChangesDialog('打开文件')
+        const choice = await window.electronAPI.showUnsavedChangesDialog('openFile')
         
         if (choice === 0) {
           // 用户选择保存
@@ -233,7 +232,7 @@ function App() {
           return
         }
       } catch (error) {
-        console.error('Error showing unsaved changes dialog:', error)
+        // 错误处理，但不输出到控制台
         return
       }
     }
@@ -241,16 +240,15 @@ function App() {
     if (window.electronAPI) {
       try {
         const result = await window.electronAPI.openFile()
-        if (result) {
-          setMarkdownContent(result.content || '')
-          setDebouncedContent(result.content || '')
+        if (result && result.success && result.content !== undefined) {
+          setMarkdownContent(result.content)
           setCurrentFilePath(result.filePath)
           setHasUnsavedChanges(false)
           setShowWelcome(false)
           setTimeout(() => clearEditorHistory(), 100)
         }
       } catch (error) {
-        console.error('Error opening file:', error)
+        // 错误处理，但不输出到控制台
       }
     }
   }, [])
@@ -260,15 +258,14 @@ function App() {
   const markdownContentRef = useRef<string>('')
   const hasUnsavedChangesRef = useRef<boolean>(false)
 
-  // 处理拖拽调整宽度 - 使用useCallback优化
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+  // 处理拖拽调整宽度
+  const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-
     isResizing.current = true
     document.body.style.cursor = 'col-resize'
     document.body.classList.add('resizing')
-  }, [])
+  }
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isResizing.current || !containerRef.current) return
@@ -282,41 +279,33 @@ function App() {
   }, [])
 
   const handleMouseUp = useCallback(() => {
-    if (isResizing.current) {
-
-    }
     isResizing.current = false
     document.body.style.cursor = ''
     document.body.classList.remove('resizing')
   }, [editorWidth])
 
-  // 重置为50:50布局 - 使用useCallback优化
-  const resetLayout = useCallback(() => {
-
+  // 重置为50:50布局
+  const resetLayout = () => {
     setEditorWidth(50)
-  }, [])
+  }
 
   // 切换预览面板显示/隐藏
   const togglePreview = useCallback(() => {
-
     setShowPreview(prev => !prev)
   }, [showPreview])
 
   // 打开搜索功能
   const openFind = useCallback(() => {
-
     setSearchMode('find')
   }, [])
 
   // 打开替换功能
   const openReplace = useCallback(() => {
-
     setSearchMode('replace')
   }, [])
 
   // 关闭搜索功能
   const closeSearch = useCallback(() => {
-
     setSearchMode(null)
   }, [])
 
@@ -380,7 +369,6 @@ function App() {
       // 监听文件打开
       const handleFileOpened = (content: string, filePath: string) => {
         setMarkdownContent(content)
-        setDebouncedContent(content)
         setCurrentFilePath(filePath)
         setHasUnsavedChanges(false)
         setShowWelcome(false)
@@ -394,24 +382,19 @@ function App() {
       const handleMenuSave = async () => {
         const currentPath = currentFilePathRef.current
         const content = markdownContentRef.current
-
         
         if (window.electronAPI) {
           try {
-
             const result = await window.electronAPI.saveFile(content, currentPath || undefined)
-
             if (result) {
               if (typeof result === 'string') {
                 // 新文件保存，返回文件路径
-
                 setCurrentFilePath(result)
               }
               setHasUnsavedChanges(false)
-
             }
           } catch (error) {
-            console.error('Error saving file:', error)
+            // 错误处理，但不输出到控制台
           }
         }
       }
@@ -419,20 +402,16 @@ function App() {
       const handleMenuSaveAs = async () => {
         const currentPath = currentFilePathRef.current
         const content = markdownContentRef.current
-
         
         if (window.electronAPI) {
           try {
-
             const result = await window.electronAPI.saveAsFile(content, currentPath || undefined)
-
             if (result.success && result.filePath) {
               setCurrentFilePath(result.filePath)
               setHasUnsavedChanges(false)
-
             }
           } catch (error) {
-            console.error('Error saving as file:', error)
+            // 错误处理，但不输出到控制台
           }
         }
       }
@@ -441,25 +420,21 @@ function App() {
 
       // 重置布局
       const handleResetLayout = () => {
-
         resetLayout()
       }
 
       // 切换预览面板
       const handleTogglePreview = () => {
-
         togglePreview()
       }
 
       // 菜单查找
       const handleMenuFind = () => {
-
         openFind()
       }
 
       // 菜单替换
       const handleMenuReplace = () => {
-
         openReplace()
       }
 
@@ -477,8 +452,6 @@ function App() {
       const handleSaveBeforeClose = async () => {
         const currentPath = currentFilePathRef.current
         const content = markdownContentRef.current
-
-        
         if (window.electronAPI) {
           try {
             const result = await window.electronAPI.saveFile(content, currentPath || undefined)
@@ -487,36 +460,46 @@ function App() {
                 setCurrentFilePath(result)
               }
               setHasUnsavedChanges(false)
-
              // 保存成功后关闭应用
              window.__hasUnsavedChanges = false
-
              // 通知主进程保存已完成，可以安全关闭
              if (window.electronAPI && window.electronAPI.notifySaveCompleted) {
                window.electronAPI.notifySaveCompleted()
              }
             }
           } catch (error) {
-            console.error('Error saving file before close:', error)
+            // 错误处理，但不输出到控制台
           }
         }
       }
 
-      // 处理PDF导出
-      const handleExportPDF = async () => {
+      // 处理PDF导出 - 从菜单调用时可能直接传入主题
+      const handleExportPDF = async (theme?: string) => {
         const content = markdownContentRef.current
         const currentPath = currentFilePathRef.current
-
         
         if (!content.trim()) {
-          alert('文档内容为空，无法导出PDF')
+          alert(i18n.emptyDocumentAlert)
           return
         }
         
+        if (theme) {
+          // 如果菜单已经指定了主题，直接导出
+          setSelectedTheme(theme as 'default' | 'academic')
+          performExportPDF(theme as 'default' | 'academic')
+        } else {
+          // 否则显示主题选择对话框
+          setShowThemeDialog(true)
+        }
+      }
+      
+      // 执行PDF导出的实际逻辑
+      const performExportPDF = async (theme: 'default' | 'academic') => {
+        const content = markdownContentRef.current
+        const currentPath = currentFilePathRef.current
+        
         if (window.electronAPI) {
           try {
-
-            
             // 使用相同的处理链将Markdown转换为HTML
             const processor = unified()
               .use(remarkParse) // 解析Markdown
@@ -536,38 +519,32 @@ function App() {
             // 获取当前文件名
             const currentFileName = currentPath ? currentPath.split('/').pop() : undefined
             
-
-            const exportResult = await window.electronAPI.exportPDF(htmlContent, currentFileName)
+            const exportResult = await window.electronAPI.exportPDF(htmlContent, currentFileName, theme)
             
             if (exportResult.success) {
-
               // 延迟隐藏进度条，让用户看到"导出完成"
               setTimeout(async () => {
                 setShowProgressDialog(false)
-                if (window.electronAPI?.showSuccessDialog && exportResult.filePath) {
-                  await window.electronAPI.showSuccessDialog({
-                    title: 'PDF导出成功',
-                    message: `PDF已成功导出到:\n${exportResult.filePath}`
-                  })
-                }
+                await window.electronAPI.showSuccessDialog({
+                  title: i18n.pdfExportSuccessTitle,
+                  message: `${i18n.pdfExportSuccess}\n${exportResult.filePath}`
+                })
               }, 1000)
             } else {
               // 如果导出失败，隐藏进度条（如果正在显示的话）
               setShowProgressDialog(false)
-              console.error('PDF export failed:', exportResult.error)
               if (exportResult.error !== 'Save canceled') {
                 await window.electronAPI.showSuccessDialog({
-                  title: 'PDF导出失败',
-                  message: `PDF导出失败: ${exportResult.error}`
+                  title: i18n.pdfExportFailedTitle,
+                  message: i18n.pdfExportFailedMessage(exportResult.error)
                 })
               }
             }
           } catch (error) {
             setShowProgressDialog(false)
-            console.error('Error exporting PDF:', error)
             await window.electronAPI.showSuccessDialog({
-              title: 'PDF导出错误',
-              message: `PDF导出过程中发生错误: ${error instanceof Error ? error.message : 'Unknown error'}`
+              title: i18n.pdfExportErrorTitle,
+              message: i18n.pdfExportErrorMessage(error instanceof Error ? error.message : 'Unknown error')
             })
           }
         }
@@ -617,15 +594,15 @@ function App() {
 
 
 
-  // 欢迎界面新建文件 - 使用useCallback优化
-  const handleWelcomeNewFile = useCallback(async () => {
+  // 欢迎界面新建文件
+  const handleWelcomeNewFile = async () => {
     await handleNewFile()
-  }, [handleNewFile])
+  }
 
-  // 欢迎界面打开文件 - 使用useCallback优化
-  const handleWelcomeOpenFile = useCallback(async () => {
+  // 欢迎界面打开文件
+  const handleWelcomeOpenFile = async () => {
     await handleOpenFile()
-  }, [handleOpenFile])
+  }
 
   return (
           <div className="app">
@@ -638,7 +615,7 @@ function App() {
                 {hasUnsavedChanges && <span className="unsaved-dot"> •</span>}
               </>
             ) : (
-              'Markdown Editor'
+              i18n.appName
             )}
           </span>
         </div>
@@ -695,7 +672,7 @@ function App() {
                    className="resize-handle"
                    onMouseDown={handleMouseDown}
                    onDoubleClick={resetLayout}
-                   title="拖拽调整宽度 | 双击重置 | Cmd/Ctrl+0 重置"
+                   title={i18n.resizeHandleTooltip}
                    style={{ 
                      minHeight: '100%'
                    }}
@@ -704,7 +681,7 @@ function App() {
                    className="preview-panel"
                    style={{ width: `${100 - editorWidth}%` }}
                  >
-                   <MarkdownPreview content={debouncedContent} />
+                   <MarkdownPreview content={markdownContent} />
                  </div>
                </>
              )}
@@ -717,6 +694,60 @@ function App() {
           progress={exportProgress}
           message={exportMessage}
         />
+        
+        {/* PDF导出主题选择对话框 */}
+        {showThemeDialog && (
+          <div className="theme-dialog-overlay">
+            <div className="theme-dialog">
+              <h3>选择PDF导出主题</h3>
+              <div className="theme-options">
+                <label className="theme-option">
+                  <input
+                    type="radio"
+                    name="theme"
+                    value="default"
+                    checked={selectedTheme === 'default'}
+                    onChange={(e) => setSelectedTheme(e.target.value as 'default' | 'academic')}
+                  />
+                  <div className="theme-info">
+                    <strong>Default</strong>
+                    <span>GitHub风格的通用文档样式</span>
+                  </div>
+                </label>
+                <label className="theme-option">
+                  <input
+                    type="radio"
+                    name="theme"
+                    value="academic"
+                    checked={selectedTheme === 'academic'}
+                    onChange={(e) => setSelectedTheme(e.target.value as 'default' | 'academic')}
+                  />
+                  <div className="theme-info">
+                    <strong>Academic</strong>
+                    <span>符合中英文学术论文标准的格式</span>
+                  </div>
+                </label>
+              </div>
+              <div className="theme-dialog-buttons">
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => setShowThemeDialog(false)}
+                >
+                  取消
+                </button>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => {
+                    setShowThemeDialog(false)
+                    performExportPDF(selectedTheme)
+                  }}
+                >
+                  导出PDF
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     )
 }

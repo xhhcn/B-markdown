@@ -1,7 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
-console.log('Preload script loaded successfully')
-
 // 暴露文件操作API给渲染进程
 contextBridge.exposeInMainWorld('electronAPI', {
   // 打开文件
@@ -55,8 +53,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onMenuReplace: (callback: () => void) =>
     ipcRenderer.on('menu-replace', callback),
 
-  onMenuExportPDF: (callback: () => void) =>
-    ipcRenderer.on('menu-export-pdf', callback),
+  onMenuExportPDF: (callback: (theme?: string) => void) =>
+    ipcRenderer.on('menu-export-pdf', (_, theme) => callback(theme)),
   
   // 移除监听器
   removeAllListeners: (channel: string) => 
@@ -79,8 +77,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   openExternalLink: (url: string) => ipcRenderer.invoke('open-external-link', url),
   
   // 导出PDF
-  exportPDF: (content: string, currentFileName?: string, filePath?: string) => 
-    ipcRenderer.invoke('export-pdf', content, currentFileName, filePath),
+  exportPDF: (content: string, currentFileName?: string, theme: string = 'default', filePath?: string) => 
+    ipcRenderer.invoke('export-pdf', content, currentFileName, theme, filePath),
   
   // 监听PDF导出进度
   onPDFExportProgress: (callback: (data: { progress: number; message: string }) => void) =>
@@ -90,8 +88,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   showSuccessDialog: (options: { title: string; message: string }) =>
     ipcRenderer.invoke('show-success-dialog', options)
 })
-
-console.log('electronAPI exposed to window successfully')
 
 // 声明全局类型
 declare global {
@@ -112,13 +108,13 @@ declare global {
       onMenuShortcuts: (callback: () => void) => void
       onMenuFind: (callback: () => void) => void
       onMenuReplace: (callback: () => void) => void
-      onMenuExportPDF: (callback: () => void) => void
+      onMenuExportPDF: (callback: (theme?: string) => void) => void
       onSaveBeforeClose: (callback: () => void) => void
       removeAllListeners: (channel: string) => void
       getUnsavedStatus: () => boolean
       notifySaveCompleted: () => void
       openExternalLink: (url: string) => Promise<void>
-      exportPDF: (content: string, currentFileName?: string, filePath?: string) => Promise<{ success: boolean; filePath?: string; error?: string }>
+      exportPDF: (content: string, currentFileName?: string, theme?: string, filePath?: string) => Promise<{ success: boolean; filePath?: string; error?: string }>
       onPDFExportProgress: (callback: (data: { progress: number; message: string }) => void) => void
     }
     __hasUnsavedChanges?: boolean

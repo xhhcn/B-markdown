@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { EditorView } from '@codemirror/view'
+import { EditorView, Decoration, DecorationSet } from '@codemirror/view'
+import { StateEffect, StateField, RangeSetBuilder } from '@codemirror/state'
+import t from '../i18n'
 
 interface FindReplaceDialogProps {
   isOpen: boolean
@@ -14,6 +16,7 @@ const FindReplaceDialog: React.FC<FindReplaceDialogProps> = ({
   editorView,
   mode
 }) => {
+  const i18n = t() // 获取国际化文本
   const [searchText, setSearchText] = useState('')
   const [replaceText, setReplaceText] = useState('')
   const [caseSensitive, setCaseSensitive] = useState(false)
@@ -67,7 +70,7 @@ const FindReplaceDialog: React.FC<FindReplaceDialogProps> = ({
         if (match[0].length === 0) break
       }
     } catch (error) {
-      console.error('Search regex error:', error)
+      // 忽略正则表达式错误
     }
     
     setTotalMatches(matches.length)
@@ -75,7 +78,7 @@ const FindReplaceDialog: React.FC<FindReplaceDialogProps> = ({
   }
   
   // 高亮匹配项
-  const highlightMatches = (_matches: { from: number; to: number }[]) => {
+  const highlightMatches = (matches: { from: number; to: number }[]) => {
     if (!editorView) return
     
     // 清除之前的高亮
@@ -232,7 +235,7 @@ const FindReplaceDialog: React.FC<FindReplaceDialogProps> = ({
                 type="text"
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
-                placeholder="输入搜索内容..."
+                placeholder={i18n.searchPlaceholder}
                 className="search-input"
               />
               <div className="search-controls">
@@ -271,7 +274,7 @@ const FindReplaceDialog: React.FC<FindReplaceDialogProps> = ({
                 type="text"
                 value={replaceText}
                 onChange={(e) => setReplaceText(e.target.value)}
-                placeholder="输入替换内容..."
+                placeholder={i18n.replacePlaceholder}
                 className="replace-input"
               />
             </div>

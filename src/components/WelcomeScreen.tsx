@@ -1,5 +1,6 @@
 import React from 'react'
 import { FiFileText, FiFolder } from 'react-icons/fi'
+import t from '../i18n'
 
 interface WelcomeScreenProps {
   onNewFile: () => void
@@ -7,11 +8,13 @@ interface WelcomeScreenProps {
 }
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNewFile, onOpenFile }) => {
+  const i18n = t()
+  
   return (
     <div className="welcome-screen">
       <div className="welcome-content">
-        <h1 className="welcome-title">Markdown Editor</h1>
-        <p className="welcome-subtitle">开始您的Markdown创作之旅</p>
+        <h1 className="welcome-title">{i18n.welcomeTitle}</h1>
+        <p className="welcome-subtitle">{i18n.welcomeSubtitle}</p>
         
         <div className="welcome-actions">
           <button 
@@ -19,7 +22,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNewFile, onOpenFile }) 
             onClick={onNewFile}
           >
             <FiFileText className="welcome-icon" />
-            <span className="welcome-text">新建文件</span>
+            <span className="welcome-text">{i18n.newFile}</span>
           </button>
           
           <button 
@@ -27,12 +30,12 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNewFile, onOpenFile }) 
             onClick={onOpenFile}
           >
             <FiFolder className="welcome-icon" />
-            <span className="welcome-text">打开文件</span>
+            <span className="welcome-text">{i18n.openFile}</span>
           </button>
         </div>
         
         <div className="welcome-footer">
-          <p>快捷键: Cmd/Ctrl+N 新建 • Cmd/Ctrl+O 打开</p>
+          <p>{i18n.welcomeShortcuts}</p>
         </div>
       </div>
     </div>
