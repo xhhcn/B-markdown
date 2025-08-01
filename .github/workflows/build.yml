@@ -111,6 +111,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: List build outputs
+        shell: bash
         run: ls -la release/
 
       - name: Upload build artifacts (Linux)
@@ -159,6 +160,7 @@ jobs:
           path: artifacts
         
       - name: Display structure of downloaded files
+        shell: bash
         run: ls -la artifacts/
         
       - name: Create Release
