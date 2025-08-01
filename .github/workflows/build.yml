@@ -172,7 +172,7 @@ jobs:
       #       release/*.blockmap
       #     if-no-files-found: error
 
-      - name: Check app size and optimize
+      - name: Check app size and enforce limits
         if: matrix.platform == 'darwin'
         shell: bash
         run: |
@@ -182,16 +182,46 @@ jobs:
             APP_PATH="release/mac/B-Markdown.app"
           fi
           
-          echo "Checking app size before optimization:"
-          du -sh "$APP_PATH"
+          echo "=== 📊 APP SIZE CHECK START ==="
+          
+          # Check initial size
+          INITIAL_SIZE=$(du -s "$APP_PATH" | cut -f1)
+          INITIAL_SIZE_MB=$((INITIAL_SIZE / 1024))
+          echo "📏 Initial app size: ${INITIAL_SIZE_MB}MB"
           
           # Remove any source maps or debug files
+          echo "🧹 Cleaning debug files..."
           find "$APP_PATH" -name "*.map" -delete
-          find "$APP_PATH" -name "*.d.ts" -delete
+          find "$APP_PATH" -name "*.d.ts" -delete  
           find "$APP_PATH" -path "*/node_modules/*" -delete 2>/dev/null || true
+          find "$APP_PATH" -name "*.log" -delete 2>/dev/null || true
           
-          echo "App size after optimization:"
-          du -sh "$APP_PATH"
+          # Check final size
+          FINAL_SIZE=$(du -s "$APP_PATH" | cut -f1)
+          FINAL_SIZE_MB=$((FINAL_SIZE / 1024))
+          echo "📏 Final app size: ${FINAL_SIZE_MB}MB"
+          
+          # Set acceptable size limits (本地构建约230MB，允许一定误差)
+          MAX_SIZE_MB=300
+          MIN_SIZE_MB=200
+          
+          echo "🎯 Size limits: ${MIN_SIZE_MB}MB - ${MAX_SIZE_MB}MB"
+          
+          if [ $FINAL_SIZE_MB -gt $MAX_SIZE_MB ]; then
+            echo "❌ ERROR: App size ${FINAL_SIZE_MB}MB exceeds maximum ${MAX_SIZE_MB}MB!"
+            echo "🔍 Largest files in app:"
+            find "$APP_PATH" -type f -exec ls -lh {} \; | sort -hr | head -10
+            echo "💡 This app is too large for users to download and use!"
+            exit 1
+          elif [ $FINAL_SIZE_MB -lt $MIN_SIZE_MB ]; then
+            echo "❌ ERROR: App size ${FINAL_SIZE_MB}MB is too small (< ${MIN_SIZE_MB}MB)!"
+            echo "🔍 This might indicate missing files!"
+            exit 1
+          else
+            echo "✅ SUCCESS: App size ${FINAL_SIZE_MB}MB is within acceptable range!"
+          fi
+          
+          echo "=== 📊 APP SIZE CHECK END ==="
           
       - name: Upload build artifacts (macOS)
         if: matrix.platform == 'darwin'

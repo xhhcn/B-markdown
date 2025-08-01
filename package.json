@@ -74,6 +74,7 @@
     "asarUnpack": [
       "**/*.{node,dll}"
     ],
+    "compression": "maximum",
 
     "mac": {
       "target": [
