@@ -70,7 +70,13 @@ jobs:
 
       - name: Build application (Linux)
         if: matrix.platform == 'linux'
-        run: npm run build:linux
+        run: |
+          echo "Linux build: Ensuring all native dependencies are available"
+          npm cache clean --force
+          rm -rf node_modules/.cache || true
+          npm install --force --no-optional
+          npm install @rollup/rollup-linux-x64-gnu --no-save
+          npm run build:linux
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
