@@ -175,7 +175,20 @@ jobs:
       #       release/*.blockmap
       #     if-no-files-found: error
 
-
+      - name: Verify build output
+        if: matrix.platform == 'darwin'
+        shell: bash
+        run: |
+          # Find and verify DMG file
+          DMG_FILE=$(find release/ -name "*.dmg" | head -1)
+          if [ -z "$DMG_FILE" ]; then
+            echo "❌ ERROR: No DMG file found!"
+            exit 1
+          fi
+          
+          echo "✅ DMG file created: $DMG_FILE"
+          echo "📏 DMG size: $(du -sh "$DMG_FILE" | cut -f1)"
+          echo "📄 DMG details: $(ls -lh "$DMG_FILE")"
           
       - name: Upload build artifacts (macOS)
         if: matrix.platform == 'darwin'
@@ -278,19 +291,17 @@ jobs:
             - 🎨 实时预览
 
             ### 📦 支持平台
-            - 🍎 **macOS**: Universal Binary (自动适配Intel + Apple Silicon)
+            - 🍎 **macOS**: Intel (x64) + Apple Silicon (arm64) 应用程序
+            <!-- 暂时禁用，将来可能恢复
+            - 🪟 **Windows**: x64 安装程序
+            - 🐧 **Linux**: AppImage + Debian包
+            -->
 
             ### 📋 更新内容
             此版本包含最新的功能改进和bug修复。
 
-            ### 🚀 安装说明
-            1. 下载 DMG 文件
-            2. 双击打开 DMG
-            3. 拖拽 B-Markdown.app 到 Applications 文件夹
-            4. 启动应用即可使用
-
             ---
-            **一个DMG文件，支持所有Mac设备！**
+            **下载对应平台的安装包即可使用！**
           files: |
             artifacts/**/*
           draft: false

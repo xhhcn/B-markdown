@@ -14,7 +14,6 @@
     "build:mac": "vite build && electron-builder --mac",
     "build:mac:x64": "vite build && electron-builder --mac --x64",
     "build:mac:arm64": "vite build && electron-builder --mac --arm64",
-    "build:mac:dir": "vite build && electron-builder --mac --dir",
     "build:win": "vite build && electron-builder --win",
     "build:linux": "vite build && electron-builder --linux",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
