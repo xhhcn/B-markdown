@@ -11,9 +11,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
     <!-- 自定义语法高亮样式 -->
     <style>
-      /* 学术风格的语法高亮配色 - 质朴而专业 */
-      .hljs {
-        background: rgba(0, 0, 0, 0.03) !important; /* 极轻微的背景色 */
+      /* 深色主题语法高亮配色 */
+      :not([data-theme="light"]) .hljs {
+        background: transparent !important;
         border-radius: 4px !important;
         font-family: "Courier New", Courier, "Liberation Mono", Monaco, Menlo, monospace !important;
         color: #D4D4D4 !important; /* 默认文本颜色 */
@@ -22,50 +22,167 @@
         scrollbar-width: none !important; /* Firefox */
       }
       
-      /* 隐藏语法高亮代码块的Webkit滚动条 */
-      .hljs::-webkit-scrollbar {
-        display: none;
-      }
-      
-      .hljs-keyword,
-      .hljs-selector-tag,
-      .hljs-subst {
+      :not([data-theme="light"]) .hljs-keyword,
+      :not([data-theme="light"]) .hljs-selector-tag,
+      :not([data-theme="light"]) .hljs-subst {
         color: #8FA1B3 !important; /* 深蓝灰色，关键字 */
       }
       
-      .hljs-string,
-      .hljs-doctag {
+      :not([data-theme="light"]) .hljs-string,
+      :not([data-theme="light"]) .hljs-doctag {
         color: #7A8471 !important; /* 深橄榄绿，字符串 */
       }
       
-      .hljs-comment,
-      .hljs-quote {
+      :not([data-theme="light"]) .hljs-comment,
+      :not([data-theme="light"]) .hljs-quote {
         color: #6B7280 !important; /* 中性灰色，注释 */
         font-style: italic;
       }
       
-      .hljs-number,
-      .hljs-literal {
+      :not([data-theme="light"]) .hljs-number,
+      :not([data-theme="light"]) .hljs-literal {
         color: #A0845C !important; /* 深金色，数字 */
       }
       
-      .hljs-function,
-      .hljs-title {
+      :not([data-theme="light"]) .hljs-function,
+      :not([data-theme="light"]) .hljs-title {
         color: #7C94B6 !important; /* 深蓝色，函数名 */
       }
       
-      .hljs-variable,
-      .hljs-attr {
+      :not([data-theme="light"]) .hljs-variable,
+      :not([data-theme="light"]) .hljs-attr {
         color: #A18B62 !important; /* 深黄褐色，变量 */
       }
+
+      :not([data-theme="light"]) .hljs-tag,
+      :not([data-theme="light"]) .hljs-name {
+        color: #7C94B6 !important; /* 蓝色，HTML标签 */
+      }
+
+      :not([data-theme="light"]) .hljs-meta,
+      :not([data-theme="light"]) .hljs-meta-keyword {
+        color: #6B7280 !important; /* 灰色，元信息 */
+        font-style: italic;
+      }
+
+      :not([data-theme="light"]) .hljs-built_in,
+      :not([data-theme="light"]) .hljs-builtin-name {
+        color: #8FA1B3 !important; /* 蓝灰色，内置函数 */
+      }
+
+      :not([data-theme="light"]) .hljs-regexp {
+        color: #A0845C !important; /* 金色，正则表达式 */
+      }
+
+      /* 浅色主题语法高亮配色 - 清晰对比 */
+      [data-theme="light"] .hljs {
+        background: transparent !important;
+        border-radius: 4px !important;
+        font-family: "Courier New", Courier, "Liberation Mono", Monaco, Menlo, monospace !important;
+        color: #2d3748 !important; /* 深色默认文本 */
+        /* 隐藏滚动条 */
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+      }
       
-      /* 确保内联代码也有合适的样式 */
-      .preview-content code:not(.hljs) {
+      [data-theme="light"] .hljs-keyword,
+      [data-theme="light"] .hljs-selector-tag,
+      [data-theme="light"] .hljs-subst {
+        color: #0066cc !important; /* 明亮蓝色，关键字 */
+        font-weight: 600;
+      }
+      
+      [data-theme="light"] .hljs-string,
+      [data-theme="light"] .hljs-doctag {
+        color: #008000 !important; /* 清晰绿色，字符串 */
+      }
+      
+      [data-theme="light"] .hljs-comment,
+      [data-theme="light"] .hljs-quote {
+        color: #666666 !important; /* 中等灰色，注释 */
+        font-style: italic;
+      }
+      
+      [data-theme="light"] .hljs-number,
+      [data-theme="light"] .hljs-literal {
+        color: #cc6600 !important; /* 橙色，数字 */
+        font-weight: 500;
+      }
+      
+      [data-theme="light"] .hljs-function,
+      [data-theme="light"] .hljs-title {
+        color: #8b00ff !important; /* 紫色，函数名 */
+        font-weight: 600;
+      }
+      
+      [data-theme="light"] .hljs-variable,
+      [data-theme="light"] .hljs-attr {
+        color: #cc0066 !important; /* 深粉色，变量 */
+      }
+
+      [data-theme="light"] .hljs-type,
+      [data-theme="light"] .hljs-class {
+        color: #0066cc !important; /* 蓝色，类型 */
+        font-weight: 600;
+      }
+
+      [data-theme="light"] .hljs-symbol,
+      [data-theme="light"] .hljs-operator {
+        color: #333333 !important; /* 深色，操作符 */
+      }
+
+      [data-theme="light"] .hljs-tag,
+      [data-theme="light"] .hljs-name {
+        color: #0066cc !important; /* 蓝色，HTML标签 */
+      }
+
+      [data-theme="light"] .hljs-meta,
+      [data-theme="light"] .hljs-meta-keyword {
+        color: #666666 !important; /* 灰色，元信息 */
+        font-style: italic;
+      }
+
+      [data-theme="light"] .hljs-built_in,
+      [data-theme="light"] .hljs-builtin-name {
+        color: #008080 !important; /* 青色，内置函数 */
+        font-weight: 500;
+      }
+
+      [data-theme="light"] .hljs-regexp {
+        color: #cc6600 !important; /* 橙色，正则表达式 */
+      }
+
+      [data-theme="light"] .hljs-deletion {
+        background-color: #ffebee !important;
+        color: #c62828 !important;
+      }
+
+      [data-theme="light"] .hljs-addition {
+        background-color: #e8f5e8 !important;
+        color: #2e7d32 !important;
+      }
+      
+      /* 深色主题内联代码样式 */
+      :not([data-theme="light"]) .preview-content code:not(.hljs) {
         background: rgba(255, 255, 255, 0.06) !important;
         color: #8FA1B3 !important;
         padding: 2px 4px !important;
         border-radius: 3px !important;
         font-family: "Courier New", Courier, "Liberation Mono", Monaco, Menlo, monospace !important;
+      }
+
+      /* 浅色主题内联代码样式 */
+      [data-theme="light"] .preview-content code:not(.hljs) {
+        background: rgba(108, 117, 125, 0.15) !important;
+        color: #0d47a1 !important;
+        padding: 2px 4px !important;
+        border-radius: 3px !important;
+        font-family: "Courier New", Courier, "Liberation Mono", Monaco, Menlo, monospace !important;
+      }
+      
+      /* 隐藏语法高亮代码块的Webkit滚动条 */
+      .hljs::-webkit-scrollbar {
+        display: none;
       }
       
       /* 强制隐藏所有可能的代码滚动条 */

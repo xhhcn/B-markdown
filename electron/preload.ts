@@ -21,6 +21,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onFileOpened: (callback: (content: string, filePath: string) => void) =>
     ipcRenderer.on('file-opened', (_, content, filePath) => callback(content, filePath)),
   
+  // 监听文件保存完成事件
+  onFileSaved: (callback: (filePath: string) => void) =>
+    ipcRenderer.on('file-saved', (_, filePath) => callback(filePath)),
+  
   // 监听菜单事件
   onMenuSave: (callback: () => void) =>
     ipcRenderer.on('menu-save-file', callback),
@@ -67,7 +71,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 用于主进程获取未保存状态的全局函数
   getUnsavedStatus: () => {
     // 这个函数会被主进程通过executeJavaScript调用
-    return window.__hasUnsavedChanges || false
+    return (window as any).__hasUnsavedChanges || false
   },
   
   // 通知主进程保存完成
@@ -86,37 +90,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // 显示成功对话框
   showSuccessDialog: (options: { title: string; message: string }) =>
-    ipcRenderer.invoke('show-success-dialog', options)
+    ipcRenderer.invoke('show-success-dialog', options),
+  
+  // 主题相关API
+  getTheme: () => ipcRenderer.invoke('get-theme'),
+  setTheme: (themeSource: 'system' | 'light' | 'dark') => ipcRenderer.invoke('set-theme', themeSource),
+  onThemeChanged: (callback: (data: { shouldUseDarkColors: boolean; themeSource: string }) => void) =>
+    ipcRenderer.on('theme-changed', (_, data) => callback(data)),
 })
 
-// 声明全局类型
-declare global {
-  interface Window {
-    electronAPI: {
-      openFile: () => Promise<{ content: string; filePath: string } | null>
-      saveFile: (content: string, filePath?: string) => Promise<boolean | string>
-      saveAsFile: (content: string, currentFilePath?: string) => Promise<{ success: boolean; filePath?: string }>
-      showUnsavedChangesDialog: (action: string) => Promise<number>
-      onFileOpened: (callback: (content: string, filePath: string) => void) => void
-      onMenuSave: (callback: () => void) => void
-      onMenuSaveAs: (callback: () => void) => void
-      onMenuOpen: (callback: () => void) => void
-      onMenuNewFile: (callback: () => void) => void
-      onMenuResetLayout: (callback: () => void) => void
-      onMenuTogglePreview: (callback: () => void) => void
-      onMenuAbout: (callback: () => void) => void
-      onMenuShortcuts: (callback: () => void) => void
-      onMenuFind: (callback: () => void) => void
-      onMenuReplace: (callback: () => void) => void
-      onMenuExportPDF: (callback: (theme?: string) => void) => void
-      onSaveBeforeClose: (callback: () => void) => void
-      removeAllListeners: (channel: string) => void
-      getUnsavedStatus: () => boolean
-      notifySaveCompleted: () => void
-      openExternalLink: (url: string) => Promise<void>
-      exportPDF: (content: string, currentFileName?: string, theme?: string, filePath?: string) => Promise<{ success: boolean; filePath?: string; error?: string }>
-      onPDFExportProgress: (callback: (data: { progress: number; message: string }) => void) => void
-    }
-    __hasUnsavedChanges?: boolean
-  }
-} 
+ 

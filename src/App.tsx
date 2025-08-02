@@ -18,6 +18,64 @@ import rehypeHighlight from 'rehype-highlight'
 import rehypeStringify from 'rehype-stringify'
 import t from './i18n'
 
+// 浅色主题扩展
+const lightTheme = EditorView.theme({
+  '&': {
+    color: 'rgba(33, 37, 41, 0.95)',
+    backgroundColor: 'transparent !important',
+  },
+  '.cm-content': {
+    color: 'rgba(33, 37, 41, 0.95)',
+  },
+  '.cm-focused': {
+    outline: 'none !important',
+  },
+  '.cm-cursor': {
+    borderLeftColor: 'rgba(33, 37, 41, 0.8)',
+  },
+  '.cm-selectionBackground': {
+    backgroundColor: 'rgba(33, 37, 41, 0.1) !important',
+  },
+  '.cm-focused .cm-selectionBackground': {
+    backgroundColor: 'rgba(33, 37, 41, 0.15) !important',
+  },
+  '&.cm-focused .cm-cursor': {
+    borderLeftColor: 'rgba(33, 37, 41, 0.9)',
+  },
+  // 移除markdown标题下划线
+  '.cm-header': {
+    textDecoration: 'none !important',
+    borderBottom: 'none !important',
+  },
+  '.cm-header-1': {
+    textDecoration: 'none !important',
+    borderBottom: 'none !important',
+  },
+  '.cm-header-2': {
+    textDecoration: 'none !important',
+    borderBottom: 'none !important',
+  },
+  '.cm-header-3': {
+    textDecoration: 'none !important',
+    borderBottom: 'none !important',
+  },
+  '.cm-header-4': {
+    textDecoration: 'none !important',
+    borderBottom: 'none !important',
+  },
+  '.cm-header-5': {
+    textDecoration: 'none !important',
+    borderBottom: 'none !important',
+  },
+  '.cm-header-6': {
+    textDecoration: 'none !important',
+    borderBottom: 'none !important',
+  },
+  '.cm-formatting-header': {
+    textDecoration: 'none !important',
+    borderBottom: 'none !important',
+  }
+})
 
 const initialMarkdown = ''
 // 透明主题扩展 - 强制滚动
@@ -33,13 +91,15 @@ const transparentTheme = EditorView.theme({
     background: 'transparent !important',
     padding: '8px 0',
     minHeight: 'auto',
+    width: '100%', /* 确保内容区域占满容器宽度 */
+    maxWidth: '100%', /* 防止内容超出容器 */
   },
   '.cm-scroller': {
     background: 'transparent !important',
     height: '100%',
     maxHeight: '100%',
     overflowY: 'overlay',
-    overflowX: 'auto', /* 只在内容超出时显示横向滚动 */
+    overflowX: 'hidden', /* 禁用横向滚动，强制自动换行 */
     scrollBehavior: 'smooth',
     width: '100%', /* 确保scroller宽度受限 */
   },
@@ -55,6 +115,9 @@ const transparentTheme = EditorView.theme({
   },
   '.cm-line': {
     background: 'transparent !important',
+    width: '100%', /* 确保行占满容器宽度 */
+    maxWidth: '100%', /* 防止行超出容器 */
+    boxSizing: 'border-box', /* 包含padding和border在宽度内 */
   },
   // 确保行号跟随内容滚动而不固定，完全自适应宽度
   '.cm-gutters': {
@@ -70,13 +133,14 @@ const transparentTheme = EditorView.theme({
     minWidth: 'unset !important', /* 移除固定最小宽度 */
     display: 'block !important', /* block显示 */
     width: '100% !important', /* 占满容器宽度 */
+    color: 'var(--line-number-color) !important', /* 使用主题变量 */
   },
   // 当前行高亮样式 - 确保背景连贯
   '.cm-activeLine': {
-    backgroundColor: 'rgba(255, 255, 255, 0.025) !important',
+    backgroundColor: 'var(--active-line-bg) !important',
   },
   '.cm-activeLineGutter': {
-    backgroundColor: 'rgba(255, 255, 255, 0.035) !important',
+    backgroundColor: 'var(--active-line-gutter-bg) !important',
     width: '100% !important', /* 确保背景覆盖整个行号列宽度 */
   },
   // 行号列背景
@@ -107,6 +171,8 @@ function App() {
   const [showThemeDialog, setShowThemeDialog] = useState(false)
   const [selectedTheme, setSelectedTheme] = useState<'default' | 'academic'>('default')
   
+  // 系统主题状态
+  const [isDarkMode, setIsDarkMode] = useState(false)
 
 
   // 同步未保存状态到全局变量，供主进程访问
@@ -153,7 +219,9 @@ function App() {
   // 监听文件内容变化
   const handleContentChange = (value: string) => {
     setMarkdownContent(value)
-    setHasUnsavedChanges(true)
+    // 只有当内容与最后保存的内容不同时才标记为未保存
+    const hasChanges = value !== lastSavedContentRef.current
+    setHasUnsavedChanges(hasChanges)
   }
 
   // 清除编辑器历史记录
@@ -182,6 +250,7 @@ function App() {
               setCurrentFilePath(result)
             }
             setHasUnsavedChanges(false)
+            lastSavedContentRef.current = content // 更新最后保存的内容
           } else {
             return // 保存失败，取消操作
           }
@@ -201,6 +270,7 @@ function App() {
     setCurrentFilePath(null)
     setHasUnsavedChanges(false)
     setShowWelcome(false)
+    lastSavedContentRef.current = '' // 重置最后保存的内容为空
     setTimeout(() => clearEditorHistory(), 100)
   }, [])
 
@@ -222,6 +292,7 @@ function App() {
               setCurrentFilePath(result)
             }
             setHasUnsavedChanges(false)
+            lastSavedContentRef.current = content // 更新最后保存的内容
           } else {
             return // 保存失败，取消操作
           }
@@ -240,11 +311,12 @@ function App() {
     if (window.electronAPI) {
       try {
         const result = await window.electronAPI.openFile()
-        if (result && result.success && result.content !== undefined) {
+        if (result && result.content !== undefined) {
           setMarkdownContent(result.content)
           setCurrentFilePath(result.filePath)
           setHasUnsavedChanges(false)
           setShowWelcome(false)
+          lastSavedContentRef.current = result.content // 设置为已打开文件的内容
           setTimeout(() => clearEditorHistory(), 100)
         }
       } catch (error) {
@@ -257,6 +329,7 @@ function App() {
   const currentFilePathRef = useRef<string | null>(null)
   const markdownContentRef = useRef<string>('')
   const hasUnsavedChangesRef = useRef<boolean>(false)
+  const lastSavedContentRef = useRef<string>('') // 跟踪最后保存的内容
 
   // 处理拖拽调整宽度
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -309,7 +382,62 @@ function App() {
     setSearchMode(null)
   }, [])
 
-  // 测试函数已移除
+  // 执行PDF导出的实际逻辑
+  const performExportPDF = useCallback(async (theme: 'default' | 'academic') => {
+    const content = markdownContentRef.current
+    const currentPath = currentFilePathRef.current
+    
+    if (window.electronAPI) {
+      try {
+        // 使用相同的处理链将Markdown转换为HTML
+        const processor = unified()
+          .use(remarkParse) // 解析Markdown
+          .use(remarkGfm) // GitHub Flavored Markdown支持
+          .use(remarkMath) // 数学公式解析支持
+          .use(remarkRehype, { allowDangerousHtml: true }) // 转换为rehype
+          .use(rehypeHighlight) // 代码语法高亮
+          .use(rehypeKatex, {
+            throwOnError: false,  // 不要因为错误而抛出异常
+            errorColor: '#ff6666'  // 错误时的颜色
+          }) // KaTeX数学公式渲染
+          .use(rehypeStringify, { allowDangerousHtml: true }) // 输出HTML
+        
+        const result = processor.processSync(content)
+        const htmlContent = String(result)
+        
+        // 获取当前文件名
+        const currentFileName = currentPath ? currentPath.split('/').pop() : undefined
+        
+        const exportResult = await window.electronAPI.exportPDF(htmlContent, currentFileName, theme)
+        
+        if (exportResult.success) {
+          // 延迟隐藏进度条，让用户看到"导出完成"
+          setTimeout(async () => {
+            setShowProgressDialog(false)
+            await window.electronAPI.showSuccessDialog({
+              title: i18n.pdfExportSuccessTitle,
+              message: `${i18n.pdfExportSuccess}\n${exportResult.filePath}`
+            })
+          }, 1000)
+        } else {
+          // 如果导出失败，隐藏进度条（如果正在显示的话）
+          setShowProgressDialog(false)
+          if (exportResult.error !== 'Save canceled') {
+            await window.electronAPI.showSuccessDialog({
+              title: i18n.pdfExportFailedTitle,
+              message: i18n.pdfExportFailedMessage(exportResult.error || 'Unknown error')
+            })
+          }
+        }
+      } catch (error) {
+        setShowProgressDialog(false)
+        await window.electronAPI.showSuccessDialog({
+          title: i18n.pdfExportErrorTitle,
+          message: i18n.pdfExportErrorMessage(error instanceof Error ? error.message : 'Unknown error')
+        })
+      }
+    }
+  }, [])
 
   // 添加全局鼠标事件监听和键盘快捷键
   useEffect(() => {
@@ -361,22 +489,54 @@ function App() {
     currentFilePathRef.current = currentFilePath
     markdownContentRef.current = markdownContent
     hasUnsavedChangesRef.current = hasUnsavedChanges
+    
+    // 将refs暴露到全局作用域，供主进程访问
+    ;(window as any).currentFilePathRef = currentFilePathRef
+    ;(window as any).markdownContentRef = markdownContentRef
   }, [currentFilePath, markdownContent, hasUnsavedChanges])
+
+  // 监听系统主题变化
+  useEffect(() => {
+    if (window.electronAPI) {
+      // 获取初始主题
+      window.electronAPI.getTheme().then(theme => {
+        setIsDarkMode(theme.shouldUseDarkColors)
+        document.documentElement.setAttribute('data-theme', theme.shouldUseDarkColors ? 'dark' : 'light')
+      })
+      
+      // 监听主题变化
+      window.electronAPI.onThemeChanged((theme) => {
+        setIsDarkMode(theme.shouldUseDarkColors)
+        document.documentElement.setAttribute('data-theme', theme.shouldUseDarkColors ? 'dark' : 'light')
+      })
+    }
+  }, [])
 
   // 监听文件打开事件和菜单命令 - 只设置一次
   useEffect(() => {
     if (window.electronAPI) {
       // 监听文件打开
-      const handleFileOpened = (content: string, filePath: string) => {
-        setMarkdownContent(content)
-        setCurrentFilePath(filePath)
+      const handleFileOpened = (data: { content: string; path: string }) => {
+        setMarkdownContent(data.content)
+        setCurrentFilePath(data.path)
         setHasUnsavedChanges(false)
         setShowWelcome(false)
+        lastSavedContentRef.current = data.content // 设置为已打开文件的内容
         // 清除编辑历史，防止撤销到之前的文件
         setTimeout(() => clearEditorHistory(), 100)
       }
       
       window.electronAPI.onFileOpened(handleFileOpened)
+
+      // 监听文件保存完成（退出时的自动保存）
+      const handleFileSaved = (filePath: string) => {
+        setCurrentFilePath(filePath)
+        setHasUnsavedChanges(false)
+        lastSavedContentRef.current = markdownContentRef.current
+        window.__hasUnsavedChanges = false
+      }
+      
+      window.electronAPI.onFileSaved?.(handleFileSaved)
 
       // 监听菜单保存命令 - 使用ref来获取最新值
       const handleMenuSave = async () => {
@@ -392,6 +552,7 @@ function App() {
                 setCurrentFilePath(result)
               }
               setHasUnsavedChanges(false)
+              lastSavedContentRef.current = content // 更新最后保存的内容
             }
           } catch (error) {
             // 错误处理，但不输出到控制台
@@ -409,6 +570,7 @@ function App() {
             if (result.success && result.filePath) {
               setCurrentFilePath(result.filePath)
               setHasUnsavedChanges(false)
+              lastSavedContentRef.current = content // 更新最后保存的内容
             }
           } catch (error) {
             // 错误处理，但不输出到控制台
@@ -448,30 +610,7 @@ function App() {
         alert(`快捷键说明：\n\n文件操作：\nCmd/Ctrl+N - 新建文件\nCmd/Ctrl+O - 打开文件\nCmd/Ctrl+S - 保存文件\nCmd/Ctrl+Shift+S - 另存为\nCmd/Ctrl+E - 导出PDF\n\n编辑操作：\nCmd/Ctrl+Z - 撤销\nCmd/Ctrl+Y - 重做\nCmd/Ctrl+F - 查找\nCmd/Ctrl+H - 替换\n\n视图操作：\nCmd/Ctrl+Shift+H - 切换预览\nCmd/Ctrl+0 - 重置布局\nF11 - 全屏切换\n\n其他：\n双击分隔线 - 重置布局`)
       }
 
-      // 处理关闭前保存
-      const handleSaveBeforeClose = async () => {
-        const currentPath = currentFilePathRef.current
-        const content = markdownContentRef.current
-        if (window.electronAPI) {
-          try {
-            const result = await window.electronAPI.saveFile(content, currentPath || undefined)
-            if (result) {
-              if (typeof result === 'string') {
-                setCurrentFilePath(result)
-              }
-              setHasUnsavedChanges(false)
-             // 保存成功后关闭应用
-             window.__hasUnsavedChanges = false
-             // 通知主进程保存已完成，可以安全关闭
-             if (window.electronAPI && window.electronAPI.notifySaveCompleted) {
-               window.electronAPI.notifySaveCompleted()
-             }
-            }
-          } catch (error) {
-            // 错误处理，但不输出到控制台
-          }
-        }
-      }
+
 
       // 处理PDF导出 - 从菜单调用时可能直接传入主题
       const handleExportPDF = async (theme?: string) => {
@@ -492,63 +631,6 @@ function App() {
           setShowThemeDialog(true)
         }
       }
-      
-      // 执行PDF导出的实际逻辑
-      const performExportPDF = async (theme: 'default' | 'academic') => {
-        const content = markdownContentRef.current
-        const currentPath = currentFilePathRef.current
-        
-        if (window.electronAPI) {
-          try {
-            // 使用相同的处理链将Markdown转换为HTML
-            const processor = unified()
-              .use(remarkParse) // 解析Markdown
-              .use(remarkGfm) // GitHub Flavored Markdown支持
-              .use(remarkMath) // 数学公式解析支持
-              .use(remarkRehype, { allowDangerousHtml: true }) // 转换为rehype
-              .use(rehypeHighlight) // 代码语法高亮
-              .use(rehypeKatex, {
-                throwOnError: false,  // 不要因为错误而抛出异常
-                errorColor: '#ff6666'  // 错误时的颜色
-              }) // KaTeX数学公式渲染
-              .use(rehypeStringify, { allowDangerousHtml: true }) // 输出HTML
-            
-            const result = processor.processSync(content)
-            const htmlContent = String(result)
-            
-            // 获取当前文件名
-            const currentFileName = currentPath ? currentPath.split('/').pop() : undefined
-            
-            const exportResult = await window.electronAPI.exportPDF(htmlContent, currentFileName, theme)
-            
-            if (exportResult.success) {
-              // 延迟隐藏进度条，让用户看到"导出完成"
-              setTimeout(async () => {
-                setShowProgressDialog(false)
-                await window.electronAPI.showSuccessDialog({
-                  title: i18n.pdfExportSuccessTitle,
-                  message: `${i18n.pdfExportSuccess}\n${exportResult.filePath}`
-                })
-              }, 1000)
-            } else {
-              // 如果导出失败，隐藏进度条（如果正在显示的话）
-              setShowProgressDialog(false)
-              if (exportResult.error !== 'Save canceled') {
-                await window.electronAPI.showSuccessDialog({
-                  title: i18n.pdfExportFailedTitle,
-                  message: i18n.pdfExportFailedMessage(exportResult.error)
-                })
-              }
-            }
-          } catch (error) {
-            setShowProgressDialog(false)
-            await window.electronAPI.showSuccessDialog({
-              title: i18n.pdfExportErrorTitle,
-              message: i18n.pdfExportErrorMessage(error instanceof Error ? error.message : 'Unknown error')
-            })
-          }
-        }
-      }
 
       // 绑定所有菜单事件
       window.electronAPI.onMenuSave(handleMenuSave)
@@ -561,7 +643,6 @@ function App() {
       window.electronAPI.onMenuReplace(handleMenuReplace)
       window.electronAPI.onMenuAbout(handleAbout)
       window.electronAPI.onMenuShortcuts(handleShortcuts)
-      window.electronAPI.onSaveBeforeClose(handleSaveBeforeClose)
       window.electronAPI.onMenuExportPDF(handleExportPDF)
       
       // 监听PDF导出进度
@@ -585,7 +666,6 @@ function App() {
           window.electronAPI.removeAllListeners('menu-replace')
           window.electronAPI.removeAllListeners('menu-about')
           window.electronAPI.removeAllListeners('menu-shortcuts')
-          window.electronAPI.removeAllListeners('save-before-close')
           window.electronAPI.removeAllListeners('menu-export-pdf')
         }
       }
@@ -635,8 +715,12 @@ function App() {
             key={editorKey}
             value={markdownContent}
             onChange={handleContentChange}
-            extensions={[markdownLang(), transparentTheme]}
-            theme={oneDark}
+            extensions={[
+              markdownLang(), 
+              transparentTheme,
+              EditorView.lineWrapping // 启用CodeMirror的自动换行功能
+            ]}
+            theme={isDarkMode ? oneDark : lightTheme}
             basicSetup={{
               lineNumbers: true,
               foldGutter: false,

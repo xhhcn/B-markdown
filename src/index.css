@@ -1,10 +1,93 @@
+/* CSS主题变量 */
+:root {
+  /* 深色主题（默认） */
+  --bg-primary: rgba(0, 0, 0, 0.08);
+  --bg-secondary: rgba(0, 0, 0, 0.03);
+  --bg-panel: rgba(0, 0, 0, 0.03);
+  --text-primary: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.85);
+  --text-tertiary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.6);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-active: rgba(255, 255, 255, 0.2);
+  --accent-color: rgba(255, 255, 255, 0.8);
+  --header-bg: #2d2d2d;
+  --header-border: #3d3d3d;
+  --link-color: rgba(255, 255, 255, 0.6);
+  --link-hover: rgba(255, 255, 255, 0.8);
+  --code-bg: rgba(0, 0, 0, 0.15);
+  --code-text: #ce9178;
+  --blockquote-border: rgba(255, 255, 255, 0.4);
+  --table-border: rgba(255, 255, 255, 0.3);
+  --table-header-bg: rgba(255, 255, 255, 0.1);
+  --line-number-color: rgba(255, 255, 255, 0.65);
+  --active-line-bg: rgba(255, 255, 255, 0.025);
+  --active-line-gutter-bg: rgba(255, 255, 255, 0.035);
+  /* 对话框主题变量 */
+  --dialog-overlay-bg: rgba(20, 20, 20, 0.85);
+  --dialog-bg: rgba(30, 30, 30, 0.98);
+  --dialog-header-bg: rgba(255, 255, 255, 0.05);
+  --dialog-header-border: rgba(255, 255, 255, 0.1);
+  --dialog-title-color: #e06c75;
+  --dialog-text-color: rgba(255, 255, 255, 0.95);
+  --dialog-text-secondary: rgba(255, 255, 255, 0.75);
+  --dialog-label-color: #c678dd;
+  --dialog-input-bg: #404040;
+  --dialog-input-border: transparent;
+  --dialog-input-focus-border: transparent;
+  --dialog-input-text: #abb2bf;
+  --dialog-button-hover: rgba(255, 255, 255, 0.1);
+  --shadow-color: rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="light"] {
+  /* 浅色主题 */
+  --bg-primary: rgba(248, 249, 250, 0.08);
+  --bg-secondary: rgba(248, 249, 250, 0.03);
+  --bg-panel: rgba(248, 249, 250, 0.03);
+  --text-primary: rgba(33, 37, 41, 0.95);
+  --text-secondary: rgba(33, 37, 41, 0.85);
+  --text-tertiary: rgba(108, 117, 125, 0.9);
+  --text-muted: rgba(108, 117, 125, 0.7);
+  --border-color: rgba(0, 0, 0, 0.1);
+  --border-active: rgba(0, 0, 0, 0.2);
+  --accent-color: rgba(33, 37, 41, 0.8);
+  --header-bg: rgba(248, 249, 250, 0.95);
+  --header-border: rgba(0, 0, 0, 0.1);
+  --link-color: #0d6efd;
+  --link-hover: #0a58ca;
+  --code-bg: rgba(108, 117, 125, 0.15);
+  --code-text: #0d47a1;
+  --blockquote-border: rgba(0, 0, 0, 0.2);
+  --table-border: rgba(0, 0, 0, 0.2);
+  --table-header-bg: rgba(0, 0, 0, 0.05);
+  --line-number-color: rgba(0, 0, 0, 0.4);
+  --active-line-bg: rgba(0, 0, 0, 0.02);
+  --active-line-gutter-bg: rgba(0, 0, 0, 0.03);
+  /* 对话框主题变量 */
+  --dialog-overlay-bg: rgba(248, 249, 250, 0.85);
+  --dialog-bg: rgba(255, 255, 255, 0.98);
+  --dialog-header-bg: rgba(0, 0, 0, 0.03);
+  --dialog-header-border: rgba(0, 0, 0, 0.1);
+  --dialog-title-color: #0d6efd;
+  --dialog-text-color: rgba(33, 37, 41, 0.95);
+  --dialog-text-secondary: rgba(108, 117, 125, 0.9);
+  --dialog-label-color: #6f42c1;
+  --dialog-input-bg: #f5f5f5;
+  --dialog-input-border: transparent;
+  --dialog-input-focus-border: transparent;
+  --dialog-input-text: rgba(33, 37, 41, 0.9);
+  --dialog-button-hover: rgba(0, 0, 0, 0.05);
+  --shadow-color: rgba(0, 0, 0, 0.08);
+}
+
 /* Welcome Screen Styles */
 .welcome-screen {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--bg-panel);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
@@ -18,9 +101,9 @@
 .welcome-title {
   font-size: 32px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-primary);
   margin-bottom: 8px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.6));
+  background: linear-gradient(135deg, var(--text-primary), var(--text-tertiary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -28,7 +111,7 @@
 
 .welcome-subtitle {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-muted);
   margin-bottom: 40px;
   font-weight: 400;
 }
@@ -47,10 +130,10 @@
   flex-direction: row;
   align-items: center;
   padding: 20px 32px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-secondary);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -64,8 +147,8 @@
 }
 
 .welcome-button:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--bg-panel);
+  border-color: var(--border-active);
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
@@ -77,14 +160,14 @@
 
 .welcome-icon {
   font-size: 20px;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--accent-color);
   flex-shrink: 0;
 }
 
 .welcome-text {
   font-size: 16px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-primary);
   white-space: nowrap;
 }
 
@@ -96,7 +179,7 @@
 
 .welcome-footer p {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -112,7 +195,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: transparent;
-  color: #ffffff;
+  color: var(--text-primary);
   height: 100vh;
   overflow: hidden;
   margin: 0;
@@ -131,7 +214,7 @@ body {
   width: 100vw;
   display: flex;
   flex-direction: column;
-  background: rgba(0, 0, 0, 0.08);
+  background: var(--bg-primary);
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
   margin: 0;
@@ -140,15 +223,15 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 
               0 16px 64px rgba(0, 0, 0, 0.25),
               0 24px 96px rgba(0, 0, 0, 0.15),
-              0 0 0 1px rgba(255, 255, 255, 0.08);
+              0 0 0 1px var(--border-color);
 }
 
 .header {
-  background: #2d2d2d;
-  border-bottom: 1px solid #3d3d3d;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
   font-size: 13px;
   font-weight: 500;
-  color: #ffffff;
+  color: var(--text-primary);
   -webkit-app-region: drag;
   height: 28px;
   display: flex;
@@ -168,7 +251,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-secondary);
   font-size: 14px;
   font-weight: 500;
   user-select: none;
@@ -176,13 +259,13 @@ body {
 }
 
 .markdown-icon {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-tertiary);
   font-size: 16px;
   flex-shrink: 0;
 }
 
 .unsaved-dot {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-secondary);
   font-size: 18px;
   font-weight: bold;
   margin-left: 4px;
@@ -199,17 +282,18 @@ body {
   min-width: 200px; /* 最小宽度限制 */
   display: flex;
   flex-direction: column;
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--bg-panel);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   position: relative;
   overflow: hidden; /* 防止内容溢出 */
   max-height: 100%;
+  width: 100%; /* 确保面板占满分配的宽度 */
 }
 
 .resize-handle {
   width: 2px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--border-color);
   cursor: col-resize;
   transition: background-color 0.2s, width 0.2s;
   position: relative;
@@ -224,13 +308,13 @@ body {
   content: '';
   width: 1px;
   height: 16px;
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--border-active);
   border-radius: 0.5px;
   transition: opacity 0.2s, height 0.2s;
 }
 
 .resize-handle:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--border-active);
   width: 4px;
 }
 
@@ -240,7 +324,7 @@ body {
 }
 
 .resize-handle:active {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--border-active);
   width: 4px;
 }
 
@@ -255,7 +339,7 @@ body.resizing {
 .preview-panel {
   flex: none; /* 不使用flex自动分配 */
   min-width: 200px; /* 最小宽度限制 */
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--bg-panel);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   overflow-y: overlay;
@@ -294,7 +378,7 @@ body.resizing {
   background: transparent !important;
   height: 100% !important;
   overflow-y: overlay !important;
-  overflow-x: auto !important; /* 只在内容真正超出时显示横向滚动 */
+  overflow-x: hidden !important; /* 禁用横向滚动，强制自动换行 */
   scroll-behavior: smooth !important;
   max-height: 100% !important;
 }
@@ -305,10 +389,15 @@ body.resizing {
   min-height: auto !important;
   padding-top: 8px !important;
   padding-bottom: 8px !important;
+  width: 100% !important; /* 确保内容区域占满容器宽度 */
+  max-width: 100% !important; /* 防止内容超出容器 */
 }
 
 .cm-editor .cm-line {
   background: transparent !important;
+  width: 100% !important; /* 确保行占满容器宽度 */
+  max-width: 100% !important; /* 防止行超出容器 */
+  box-sizing: border-box !important; /* 包含padding和border在宽度内 */
 }
 
 .cm-editor .cm-focused {
@@ -334,7 +423,7 @@ body.resizing {
 }
 
 .cm-editor .cm-lineNumbers .cm-gutterElement {
-  color: rgba(255, 255, 255, 0.65) !important;
+  color: var(--line-number-color) !important;
   padding: 0 8px 0 4px !important; /* 左边4px，右边8px，确保与内容对齐 */
   text-align: right !important; /* 右对齐 */
   min-width: unset !important; /* 移除固定最小宽度 */
@@ -344,11 +433,11 @@ body.resizing {
 
 /* 当前行高亮 - 确保背景连贯 */
 .cm-editor .cm-activeLine {
-  background: rgba(255, 255, 255, 0.025) !important;
+  background: var(--active-line-bg) !important;
 }
 
 .cm-editor .cm-activeLineGutter {
-  background: rgba(255, 255, 255, 0.035) !important;
+  background: var(--active-line-gutter-bg) !important;
   width: 100% !important; /* 确保背景覆盖整个行号列宽度 */
 }
 
@@ -381,6 +470,24 @@ body.resizing {
   background: transparent !important;
 }
 
+/* 强制移除CodeMirror编辑器中所有markdown标题的下划线 */
+.cm-editor .cm-header,
+.cm-editor .cm-header-1,
+.cm-editor .cm-header-2,
+.cm-editor .cm-header-3,
+.cm-editor .cm-header-4,
+.cm-editor .cm-header-5,
+.cm-editor .cm-header-6,
+.cm-editor .cm-formatting-header {
+  text-decoration: none !important;
+  border-bottom: none !important;
+  text-decoration-line: none !important;
+  text-decoration-style: none !important;
+  text-decoration-color: transparent !important;
+  border-bottom-width: 0 !important;
+  border-bottom-style: none !important;
+}
+
 /* Preview styles for glass effect */
 .preview-content {
   padding-bottom: 0; /* 不需要额外底部间距，容器已处理 */
@@ -395,10 +502,12 @@ body.resizing {
   margin-top: 0 !important; /* 移除第一个元素的上边距 */
 }
 
+/* 预览部分保留标题下划线样式 */
+
 /* 段落和基本文本样式 */
 .preview-content p {
   margin: 15px 0; /* 标准段落间距 */
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--text-secondary);
 }
 
 /* 图片自适应宽度 */
@@ -460,66 +569,60 @@ body.resizing {
 .preview-content th,
 .preview-content td {
   padding: 8px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--table-border);
   text-align: left;
   word-wrap: break-word; /* 允许单元格内容换行 */
 }
 
 .preview-content th {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--table-header-bg);
   font-weight: bold;
 }
 
 .preview-content h1 {
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--text-primary);
   font-size: 2em; /* 28px */
   margin: 20px 0 10px; /* 标准标题间距，与PDF一致 */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.3em;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   font-weight: bold;
 }
 
 .preview-content h2 {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-primary);
   font-size: 1.5em; /* 24px */
   margin: 20px 0 10px; /* 标准标题间距，与PDF一致 */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.3em;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   font-weight: bold;
 }
 
 .preview-content h3 {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-primary);
   font-size: 1.25em; /* 18px */
   margin: 20px 0 10px; /* 标准标题间距，与PDF一致 */
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   font-weight: bold;
 }
 
 /* h4, h5, h6 标题样式 */
 .preview-content h4 {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-primary);
   font-size: 1.15em; /* 16px */
   margin: 20px 0 10px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   font-weight: bold;
 }
 
 .preview-content h5 {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-primary);
   font-size: 0.95em; /* 13px */
   margin: 20px 0 10px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   font-weight: bold;
 }
 
 .preview-content h6 {
-  color: rgba(255, 255, 255, 0.7); /* 稍暗的颜色 */
+  color: var(--text-tertiary); /* 稍暗的颜色 */
   font-size: 0.85em; /* 12px */
   margin: 20px 0 10px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   font-weight: bold;
 }
 
@@ -536,13 +639,12 @@ body.resizing {
 .preview-content ul, .preview-content ol {
   margin: 15px 0; /* 与段落间距一致，标准间距 */
   padding-left: 2em;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-secondary);
 }
 
 .preview-content li {
   margin: 4px 0; /* 列表项之间的小间距 */
-  color: rgba(255, 255, 255, 0.8);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  color: var(--text-secondary);
   line-height: 1.6; /* 继承标准行距 */
 }
 
@@ -555,11 +657,11 @@ body.resizing {
 }
 
 .preview-content pre {
-  background: rgba(0, 0, 0, 0.15);
+  background: var(--code-bg);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   padding: 16px; /* 标准内边距 */
   margin: 15px 0; /* 与其他元素间距一致 */
   overflow-x: auto; /* 代码块横向滚动 */
@@ -579,31 +681,31 @@ body.resizing {
 }
 
 .preview-content code {
-  background: rgba(0, 0, 0, 0.1);
-  color: #ce9178;
+  background: var(--code-bg);
+  color: var(--code-text);
   padding: 0.2em 0.4em;
-  border-radius: 2px;
+  border-radius: 3px;
+  border: none;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 0.9em;
-  border: none;
   word-wrap: break-word; /* 内联代码可以换行 */
 }
 
 .preview-content pre code {
-  background: none;
+  background: none !important;
   padding: 0;
-  color: #d4d4d4;
-  border: none;
+  color: var(--code-text);
+  border: none !important;
+  border-radius: 0;
   white-space: pre; /* 保持代码块格式，不换行 */
 }
 
 .preview-content blockquote {
-  border-left: 4px solid rgba(255, 255, 255, 0.4);
+  border-left: 4px solid var(--blockquote-border);
   margin: 15px 0; /* 标准间距，与其他元素一致 */
   padding: 8px 0 8px 16px; /* 标准内边距 */
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-tertiary);
   font-style: italic;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   line-height: 1.6; /* 继承标准行距 */
 }
 
@@ -618,19 +720,19 @@ body.resizing {
 
 /* 预览内容中的链接样式 */
 .preview-content a {
-  color: rgba(255, 255, 255, 0.6) !important; /* 深灰色 */
+  color: var(--link-color) !important;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .preview-content a:hover {
-  color: rgba(255, 255, 255, 0.8) !important; /* 悬停时稍亮 */
+  color: var(--link-hover) !important;
   text-decoration: underline;
 }
 
 /* KaTeX数学公式样式 */
 .preview-content .katex {
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: var(--text-primary) !important;
   overflow-x: auto; /* 内联数学公式也支持横向滚动 */
   max-width: 100%; /* 限制最大宽度 */
   /* 修复行内公式高度问题 - 使用inline而不是inline-block */
@@ -663,33 +765,33 @@ body.resizing {
 }
 
 .preview-content .katex .base {
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: var(--text-primary) !important;
 }
 
 /* 确保数学公式文字颜色与主题一致 */
 .preview-content .katex .mord {
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: var(--text-primary) !important;
 }
 
 .preview-content .katex .mop {
-  color: rgba(255, 255, 255, 0.85) !important;
+  color: var(--text-secondary) !important;
 }
 
 .preview-content .katex .mbin {
-  color: rgba(255, 255, 255, 0.85) !important;
+  color: var(--text-secondary) !important;
 }
 
 .preview-content .katex .mrel {
-  color: rgba(255, 255, 255, 0.85) !important;
+  color: var(--text-secondary) !important;
 }
 
 .preview-content .katex .mopen,
 .preview-content .katex .mclose {
-  color: rgba(255, 255, 255, 0.8) !important;
+  color: var(--text-secondary) !important;
 }
 
 .preview-content .katex .mpunct {
-  color: rgba(255, 255, 255, 0.7) !important;
+  color: var(--text-tertiary) !important;
 }
 
 /* 查找/替换对话框样式 */
@@ -727,9 +829,9 @@ body.resizing {
 }
 
 .find-replace-header {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--dialog-header-bg);
   padding: 12px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--dialog-header-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -739,13 +841,13 @@ body.resizing {
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: #e06c75;
+  color: var(--dialog-title-color);
 }
 
 .close-button {
   background: none;
   border: none;
-  color: #abb2bf;
+  color: var(--dialog-input-text);
   font-size: 18px;
   cursor: pointer;
   padding: 4px 8px;
@@ -754,8 +856,8 @@ body.resizing {
 }
 
 .close-button:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #e06c75;
+  background: var(--dialog-button-hover);
+  color: var(--dialog-title-color);
 }
 
 .find-replace-content {
@@ -771,7 +873,7 @@ body.resizing {
   margin-bottom: 6px;
   font-size: 12px;
   font-weight: 500;
-  color: #c678dd;
+  color: var(--dialog-label-color);
 }
 
 .input-with-controls {
@@ -783,11 +885,11 @@ body.resizing {
 .search-input,
 .replace-input {
   flex: 1;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--dialog-input-bg);
+  border: 1px solid var(--dialog-input-border);
   border-radius: 6px;
   padding: 8px 12px;
-  color: #abb2bf;
+  color: var(--dialog-input-text);
   font-size: 13px;
   transition: all 0.2s ease;
 }
@@ -795,14 +897,14 @@ body.resizing {
 .search-input:focus,
 .replace-input:focus {
   outline: none;
-  border-color: #61afef;
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 0 2px rgba(97, 175, 239, 0.2);
+  border-color: var(--dialog-input-focus-border);
+  background: var(--dialog-input-bg);
+  box-shadow: none;
 }
 
 .search-input::placeholder,
 .replace-input::placeholder {
-  color: #5c6370;
+  color: var(--text-muted);
 }
 
 .search-controls {
@@ -811,11 +913,11 @@ body.resizing {
 }
 
 .control-button {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--dialog-input-bg);
+  border: 1px solid var(--dialog-input-border);
   border-radius: 4px;
   padding: 6px 8px;
-  color: #abb2bf;
+  color: var(--dialog-input-text);
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
@@ -824,25 +926,25 @@ body.resizing {
 }
 
 .control-button:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.25);
+  background: var(--dialog-button-hover);
+  border-color: var(--dialog-input-border);
 }
 
 .control-button.active {
-  background: rgba(97, 175, 239, 0.2);
-  border-color: #61afef;
-  color: #61afef;
+  background: var(--dialog-button-hover);
+  border-color: var(--dialog-input-border);
+  color: var(--dialog-input-text);
 }
 
 .search-info {
   margin: 12px 0;
   font-size: 12px;
-  color: #98c379;
+  color: var(--dialog-text-secondary);
   text-align: center;
   padding: 6px;
-  background: rgba(152, 195, 121, 0.1);
+  background: var(--dialog-input-bg);
   border-radius: 4px;
-  border: 1px solid rgba(152, 195, 121, 0.2);
+  border: 1px solid var(--dialog-input-border);
 }
 
 .action-buttons {
@@ -859,11 +961,11 @@ body.resizing {
 }
 
 .nav-button {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--dialog-input-bg);
+  border: 1px solid var(--dialog-input-border);
   border-radius: 4px;
   padding: 6px 10px;
-  color: #abb2bf;
+  color: var(--dialog-input-text);
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -871,8 +973,8 @@ body.resizing {
 }
 
 .nav-button:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.25);
+  background: var(--dialog-button-hover);
+  border-color: var(--dialog-input-border);
 }
 
 .nav-button:disabled {
@@ -891,7 +993,7 @@ body.resizing {
   border: 1px solid rgba(224, 108, 117, 0.4);
   border-radius: 6px;
   padding: 6px 12px;
-  color: #e06c75;
+  color: var(--dialog-title-color);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -901,7 +1003,7 @@ body.resizing {
 .replace-button:hover:not(:disabled),
 .replace-all-button:hover:not(:disabled) {
   background: rgba(224, 108, 117, 0.3);
-  border-color: #e06c75;
+  border-color: var(--dialog-title-color);
 }
 
 .replace-button:disabled,
@@ -911,14 +1013,14 @@ body.resizing {
 }
 
 .find-replace-footer {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--dialog-header-bg);
   padding: 8px 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--dialog-header-border);
   text-align: center;
 }
 
 .find-replace-footer small {
-  color: #5c6370;
+  color: var(--text-muted);
   font-size: 11px;
 }
 
@@ -966,28 +1068,29 @@ body.resizing {
 
 .search-input {
   width: 320px;
-  background: #2a2a2a;
-  border: none;
+  background: var(--dialog-input-bg);
+  border: 1px solid var(--dialog-input-border);
   border-radius: 8px;
   padding: 12px 16px;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--dialog-input-text);
   font-size: 14px;
   font-family: inherit;
   font-weight: 400;
   outline: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: none;
 }
 
 .search-input:focus {
-  background: #323232;
-  color: rgba(255, 255, 255, 1);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
-  transform: translateY(-1px);
+  background: var(--dialog-input-bg);
+  color: var(--dialog-input-text);
+  border-color: var(--dialog-input-focus-border);
+  box-shadow: none;
+  transform: none;
 }
 
 .search-input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
 }
 
 /* 进度条对话框样式 - 匹配深灰色毛玻璃主题 */
@@ -997,7 +1100,7 @@ body.resizing {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(20, 20, 20, 0.85);
+  background: var(--dialog-overlay-bg);
   backdrop-filter: blur(20px) saturate(150%) brightness(0.7);
   -webkit-backdrop-filter: blur(20px) saturate(150%) brightness(0.7);
   display: flex;
@@ -1007,7 +1110,7 @@ body.resizing {
 }
 
 .progress-dialog {
-  background: rgba(30, 30, 30, 0.98);
+  background: var(--dialog-bg);
   backdrop-filter: blur(30px) saturate(180%);
   -webkit-backdrop-filter: blur(30px) saturate(180%);
   border-radius: 18px;
@@ -1021,7 +1124,7 @@ body.resizing {
 }
 
 .progress-dialog h3 {
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--dialog-text-color);
   margin: 0 0 24px 0;
   font-size: 19px;
   font-weight: 600;
@@ -1051,7 +1154,7 @@ body.resizing {
 }
 
 .progress-message {
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--dialog-text-secondary);
   margin: 16px 0 8px 0;
   font-size: 15px;
   font-weight: 400;
@@ -1059,15 +1162,11 @@ body.resizing {
 }
 
 .progress-percentage {
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--dialog-text-color);
   font-size: 17px;
   font-weight: 600;
   margin-top: 12px;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 /* PDF导出主题选择对话框样式 */

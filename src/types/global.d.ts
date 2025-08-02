@@ -2,22 +2,28 @@ declare global {
   interface Window {
     electronAPI: {
       // 文件操作
-      openFile: () => Promise<{ success: boolean; content?: string; path?: string }>;
-      saveFile: (content: string, path?: string) => Promise<{ success: boolean; path?: string }>;
-      saveAsFile: (content: string, path?: string) => Promise<{ success: boolean; path?: string }>;
+      openFile: () => Promise<{ content: string; filePath: string } | null>;
+      saveFile: (content: string, path?: string) => Promise<string | boolean>;
+      saveAsFile: (content: string, path?: string) => Promise<{ success: boolean; filePath?: string }>;
       
       // PDF导出
-      exportPDF: (htmlContent: string, fileName: string, theme: string) => Promise<{ success: boolean; path?: string }>;
+      exportPDF: (htmlContent: string, fileName?: string, theme?: string) => Promise<{ success: boolean; filePath?: string; error?: string }>;
       
       // 对话框
       showUnsavedChangesDialog: (action: string) => Promise<number>;
       showSuccessDialog: (options: { title: string; message: string }) => Promise<void>;
+      
+      // 主题相关
+      getTheme: () => Promise<{ shouldUseDarkColors: boolean; themeSource: string }>;
+      setTheme: (themeSource: string) => Promise<{ shouldUseDarkColors: boolean; themeSource: string }>;
+      onThemeChanged: (callback: (data: { shouldUseDarkColors: boolean; themeSource: string }) => void) => void;
       
       // 外部链接
       openExternalLink?: (url: string) => void;
       
       // 事件监听器
       onFileOpened: (callback: (data: { content: string; path: string }) => void) => void;
+      onFileSaved?: (callback: (filePath: string) => void) => void;
       onMenuSave: (callback: () => void) => void;
       onMenuSaveAs: (callback: () => void) => void;
       onMenuOpen: (callback: () => void) => void;
